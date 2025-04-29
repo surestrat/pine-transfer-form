@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+jinja2
+python-dotenv
+aiofiles
+email-validator
+
+pydantic[email]
+
+requests
+python-multipart
