@@ -17,7 +17,19 @@ app.use(bodyParser.json());
 // Email endpoint
 app.post("/api/send-email", async (req, res) => {
 	try {
-		const { to, from, subject, html, text } = req.body;
+		let { to, from, subject, html, text } = req.body;
+
+		// Use NOTIFICATION_EMAILS from env if 'to' is not provided or empty
+		if (!to || to.trim() === "") {
+			to = process.env.NOTIFICATION_EMAILS || "";
+		}
+
+		if (!to || !subject || !html) {
+			return res.status(400).json({
+				success: false,
+				error: "Missing required fields to, subject, or html",
+			});
+		}
 
 		console.log("Received email request:", {
 			to,
@@ -27,11 +39,11 @@ app.post("/api/send-email", async (req, res) => {
 
 		// Create transporter with cPanel SMTP settings
 		const transporter = nodemailer.createTransport({
-			host: process.env.SMTP_HOST || "mail.surestrat.co.za",
-			port: parseInt(process.env.SMTP_PORT || "465"),
+			host: process.env.SMTP_HOST || "",
+			port: parseInt(process.env.SMTP_PORT || ""),
 			secure: process.env.SMTP_SECURE === "true" || true,
 			auth: {
-				user: process.env.SMTP_USER || "no-reply@surestrat.co.za",
+				user: process.env.SMTP_USER || "",
 				pass: process.env.SMTP_PASS || "",
 			},
 		});
@@ -58,7 +70,7 @@ app.post("/api/send-email", async (req, res) => {
 		for (const recipient of recipients) {
 			try {
 				const info = await transporter.sendMail({
-					from: from || "no-reply@surestrat.co.za",
+					from: from || "",
 					to: recipient,
 					subject,
 					html,
@@ -110,7 +122,5 @@ app.get("/api/status", (req, res) => {
 app.listen(PORT, () => {
 	console.log(`Email server running on port ${PORT}`);
 	console.log(`Send emails to: http://localhost:${PORT}/api/send-email`);
-	console.log(
-		`Using SMTP server: ${process.env.SMTP_HOST || "mail.surestrat.co.za"}`
-	);
+	console.log(`Using SMTP server: ${process.env.SMTP_HOST || ""}`);
 });

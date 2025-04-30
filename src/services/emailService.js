@@ -1,14 +1,11 @@
 import axios from "axios";
 
-// Configuration (should be in environment variables in production)
-const EMAIL_API_URL = "https://email.example.com/api/tx";
-const EMAIL_API_USER = "api_user";
-const EMAIL_API_TOKEN = "token";
-const TEMPLATE_ID = 1; // Replace with your actual template ID
-const NOTIFICATION_EMAILS = ["agent@surestrat.com", "admin@surestrat.com"]; // Replace with actual notification emails
+// Use local backend endpoint
+const EMAIL_API_URL = "/api/send-email";
+const NOTIFICATION_EMAILS = ["agent@surestrat.com", "admin@surestrat.com"]; // Update as needed
 
 /**
- * Sends notification emails through Listmonk API
+ * Sends notification emails through your Express/nodemailer backend
  * @param {Object} formData - Customer details from the form
  * @param {Object} agentInfo - Agent information (name/branch)
  * @param {string} pine_client_id - UUID from Pineapple API
@@ -21,12 +18,6 @@ export const sendNotificationEmails = async (
 	url
 ) => {
 	try {
-		// Create authentication header for Basic Auth
-		const auth = {
-			username: EMAIL_API_USER,
-			password: EMAIL_API_TOKEN,
-		};
-
 		// Format date for email
 		const currentDate = new Date().toLocaleString("en-ZA", {
 			year: "numeric",
@@ -36,37 +27,33 @@ export const sendNotificationEmails = async (
 			minute: "2-digit",
 		});
 
-		// Prepare data payload for email template
-		const emailData = {
-			subscriber_emails: NOTIFICATION_EMAILS,
-			template_id: TEMPLATE_ID,
-			content_type: "html",
-			data: {
-				// Customer info
-				customer_name: `${formData.first_name} ${formData.last_name}`,
-				customer_email: formData.email,
-				customer_id: formData.id_number,
-				customer_phone: formData.contact_number,
-				quote_id: formData.quote_id,
+		// Compose email content
+		const subject = "New Pineapple Transfer Form Submission";
+		const html = `
+			<h2>New Pineapple Transfer Form Submission</h2>
+			<p><strong>Customer Name:</strong> ${formData.first_name} ${formData.last_name}</p>
+			<p><strong>Email:</strong> ${formData.email}</p>
+			<p><strong>ID Number:</strong> ${formData.id_number}</p>
+			<p><strong>Contact Number:</strong> ${formData.contact_number}</p>
+			<p><strong>Quote ID:</strong> ${formData.quote_id}</p>
+			<p><strong>Agent:</strong> ${agentInfo.agent}</p>
+			<p><strong>Branch:</strong> ${agentInfo.branch}</p>
+			<p><strong>Pine Client ID:</strong> ${pine_client_id}</p>
+			<p><strong>Redirect URL:</strong> <a href="${url}">${url}</a></p>
+			<p><strong>Submission Date:</strong> ${currentDate}</p>
+		`;
 
-				// Agent info
-				agent_name: agentInfo.agent,
-				branch: agentInfo.branch,
-
-				// Transaction info
-				pine_client_id: pine_client_id,
-				redirect_url: url,
-				submission_date: currentDate,
-
-				// Additional info for email template
-				app_name: "SureStrat Pineapple Transfer Form",
-			},
+		const payload = {
+			to: NOTIFICATION_EMAILS.join(","),
+			from: "no-reply@surestrat.co.za",
+			subject,
+			html,
+			text: html.replace(/<[^>]*>/g, ""),
 		};
 
-		// Make API request to send email
-		const response = await axios.post(EMAIL_API_URL, emailData, { auth });
+		const response = await axios.post(EMAIL_API_URL, payload);
 
-		if (response.data && response.data.data === true) {
+		if (response.data && response.data.success) {
 			console.log("Notification emails sent successfully");
 			return true;
 		} else {

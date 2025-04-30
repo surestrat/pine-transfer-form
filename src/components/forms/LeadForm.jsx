@@ -6,9 +6,7 @@ import {
 	AlertCircle,
 	Loader2,
 	User,
-	Building,
 	Mail,
-	Hash,
 	Phone,
 	FileText,
 } from "lucide-react";
@@ -18,17 +16,18 @@ import { Button } from "@components/ui/Button";
 import { submitLead } from "@services/apiService";
 import { submitLeadViaProxy } from "@services/proxyApiService";
 import { saveToAppwrite } from "@services/appwriteService";
-import { transformPineappleUrl } from "@utils/urlTransformer";
-// import { sendNotificationEmails } from "@services/emailService"; // Commented out email service
-import { ID } from "appwrite"; // Import Appwrite ID for unique ID generation
+
+import { ID } from "appwrite";
 
 const branchOptions = [
 	{ value: "", label: "Select Office..." },
-	{ value: "Sandton", label: "Sandton" },
-	{ value: "Cape Town", label: "Cape Town" },
-	{ value: "Durban", label: "Durban" },
-	{ value: "Pretoria", label: "Pretoria" },
-	{ value: "Bloemfontein", label: "Bloemfontein" },
+	{ value: "Lenasia-HO", label: "Lenasia-HO" },
+	{ value: "Lenasia-Moe", label: "Lenasia-Moe" },
+	{ value: "Lenasia-Ziyaad", label: "Lenasia-Ziyaad" },
+	{ value: "Lenasia-Tariq", label: "Lenasia-Tariq" },
+	{ value: "Rosebank-Irshad", label: "Rosebank-Irshad" },
+	{ value: "Vereeniging-Ahmed", label: "Vereeniging-Ahmed" },
+	{},
 	// Add more branches as needed
 ];
 
@@ -44,7 +43,6 @@ const LeadForm = () => {
 		updateAgentInfo,
 		errors,
 		validateForm,
-		resetForm,
 		setApiResponse,
 	} = useFormStore();
 
@@ -65,7 +63,6 @@ const LeadForm = () => {
 		const isValid = validateForm();
 
 		if (!isValid) {
-			// Focus first invalid field
 			const firstErrorField = Object.keys(errors)[0];
 			if (firstErrorField) {
 				const inputElement = document.querySelector(
@@ -117,14 +114,11 @@ const LeadForm = () => {
 
 			// Extract uuid as pine_client_id and redirect_url as url from the API response
 			const pine_client_id = apiResponse?.data?.uuid || "";
-			const originalUrl = apiResponse?.data?.redirect_url || "";
-
-			// Transform the URL for production use
-			const url = transformPineappleUrl(originalUrl);
+			const url = apiResponse?.data?.redirect_url || "";
 
 			console.log("Extracted from API response:", {
 				pine_client_id,
-				originalUrl,
+				originalUrl: apiResponse?.data?.redirect_url,
 				transformedUrl: url,
 			});
 
@@ -135,18 +129,15 @@ const LeadForm = () => {
 				branch: agentInfo.branch,
 				quote_id: generatedQuoteId, // Use generated quote ID
 				pine_client_id, // Add the uuid as pine_client_id
-				url, // Add the transformed redirect_url as url
+				url, // Use the original redirect_url as url
 			});
 
-			/* Email notification functionality - to be implemented later
 			try {
 				await sendNotificationEmails(formData, agentInfo, pine_client_id, url);
 				console.log("Email notification sent successfully");
 			} catch (emailError) {
 				console.error("Failed to send email notification:", emailError);
-				// Continue with form submission even if email fails
 			}
-			*/
 
 			// Navigate to success page without resetting form yet
 			navigate("/success");

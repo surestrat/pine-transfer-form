@@ -17,58 +17,7 @@ export default defineConfig({
 		},
 		// Setup proxy for the gw-test.pineapple.co.za API calls
 		proxy: {
-			"/pineapple-api": {
-				target: "http://gw-test.pineapple.co.za",
-				changeOrigin: true,
-				rewrite: (path) => path.replace(/^\/pineapple-api/, ""),
-				secure: false,
-				configure: (proxy, _options) => {
-					proxy.on("error", (err, _req, _res) => {
-						console.log("proxy error", err);
-					});
-					proxy.on("proxyReq", (proxyReq, req, _res) => {
-						console.log("Sending Request:", req.method, req.url);
-
-						// Ensure proper headers for the proxy request
-						proxyReq.setHeader("Content-Type", "application/json");
-
-						// Add authorization header if it exists in the original request
-						const authHeader = req.headers["authorization"];
-						if (authHeader) {
-							proxyReq.setHeader("Authorization", authHeader);
-						}
-					});
-					proxy.on("proxyRes", (proxyRes, req, _res) => {
-						const statusCode = proxyRes.statusCode;
-						console.log(
-							`Received Response from: ${req.url} with status: ${statusCode}`
-						);
-
-						// Enhanced error logging for 500 responses
-						if (statusCode >= 400) {
-							let responseBody = "";
-							proxyRes.on("data", (chunk) => {
-								responseBody += chunk.toString();
-							});
-
-							proxyRes.on("end", () => {
-								try {
-									const parsedBody = JSON.parse(responseBody);
-									console.log(
-										`Error response details for ${req.url}:`,
-										parsedBody
-									);
-								} catch (e) {
-									console.log(
-										`Raw error response for ${req.url}:`,
-										responseBody
-									);
-								}
-							});
-						}
-					});
-				},
-			},
+			"/api": "http://localhost:3001",
 		},
 	},
 	resolve: {
