@@ -13,8 +13,8 @@ export const transformPineappleUrl = (url) => {
 		// Check if it's a localhost URL
 		if (urlObj.hostname === "localhost") {
 			// Replace the host and protocol
-			urlObj.hostname = "www.pineapple.co.za";
-			urlObj.protocol = "https:"; // Use https for production domain
+			urlObj.hostname = "web.pineapple.co.za";
+			urlObj.protocol = "http:"; // Use https for production domain
 
 			// Remove any port number
 			urlObj.port = "";
