@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import Logo from "../components/ui/Logo";
 import { Button } from "../components/ui/Button";
 import { useFormStore } from "../store/formStore";
-import { transformPineappleUrl } from "../utils/urlTransformer";
 
 const SuccessPage = () => {
 	const navigate = useNavigate();
@@ -17,10 +16,7 @@ const SuccessPage = () => {
 	useEffect(() => {
 		// Extract and transform redirect URL if available
 		if (apiResponse?.data?.redirect_url) {
-			const transformedUrl = transformPineappleUrl(
-				apiResponse.data.redirect_url
-			);
-			setRedirectUrl(transformedUrl);
+			setRedirectUrl(apiResponse.data.redirect_url);
 
 			// Set up countdown timer
 			const timer = setInterval(() => {
@@ -28,7 +24,9 @@ const SuccessPage = () => {
 					if (prev <= 1) {
 						clearInterval(timer);
 						// Redirect to the transformed URL
-						window.location.href = transformedUrl;
+						window.location.href = setRedirectUrl(
+							apiResponse.data.redirect_url
+						);
 						return 0;
 					}
 					return prev - 1;
