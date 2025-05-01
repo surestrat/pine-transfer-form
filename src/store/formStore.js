@@ -38,7 +38,8 @@ export const useFormStore = create((set, get) => ({
 	formData: initialFormData,
 	agentInfo: initialAgentInfo,
 	errors: {},
-	apiResponse: null, // Add API response state
+	apiResponse: null,
+	redirectUrl: null, // Add redirectUrl state to store the URL separately
 
 	updateField: (field, value) => {
 		set((state) => {
@@ -125,7 +126,12 @@ export const useFormStore = create((set, get) => ({
 	},
 
 	setApiResponse: (response) => {
-		set({ apiResponse: response });
+		// Extract and set redirect URL if it exists in the response
+		const redirectUrl = response?.data?.redirect_url || null;
+		set({
+			apiResponse: response,
+			redirectUrl: redirectUrl,
+		});
 	},
 
 	resetForm: () => {
@@ -133,7 +139,8 @@ export const useFormStore = create((set, get) => ({
 			formData: initialFormData,
 			agentInfo: initialAgentInfo,
 			errors: {},
-			apiResponse: null, // Reset API response too
+			apiResponse: null,
+			redirectUrl: null, // Also reset redirect URL
 		});
 	},
 }));

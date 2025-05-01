@@ -16,6 +16,16 @@ export const submitForm = async (payload) => {
 				Accept: "application/json",
 			},
 		});
+
+		// Validate that we have a proper response
+		if (response.data) {
+			// Log the redirect URL for debugging if present
+			if (response.data.data && response.data.data.redirect_url) {
+				console.log("Received redirect URL:", response.data.data.redirect_url);
+			}
+			return response.data;
+		}
+
 		return response.data;
 	} catch (error) {
 		console.error("API Error details:", error);
