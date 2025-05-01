@@ -13,11 +13,7 @@ import {
 import { useFormStore } from "@store/formStore";
 import { InputField } from "@components/ui/InputField";
 import { Button } from "@components/ui/Button";
-import { submitLead } from "@services/apiService";
-import { submitLeadViaProxy } from "@services/proxyApiService";
-import { saveToAppwrite } from "@services/appwriteService";
-
-import { ID } from "appwrite";
+import { submitForm } from "@services/apiService";
 
 const branchOptions = [
 	{ value: "", label: "Select Office..." },
@@ -76,70 +72,18 @@ const LeadForm = () => {
 		setIsSubmitting(true);
 
 		try {
-			// Generate a unique quote ID
-			const generatedQuoteId = ID.unique();
-
-			// Format data for API submission
-			const apiPayload = {
-				source: "SureStrat",
-				first_name: formData.first_name,
-				last_name: formData.last_name,
-				email: formData.email,
-				id_number: formData.id_number,
-				quote_id: generatedQuoteId,
-				contact_number: formData.contact_number,
-				additionalProp1: {},
-			};
-
-			// Use proxy in development, direct in production
-			let apiResponse;
-			if (import.meta.env.DEV) {
-				// Use proxy in development
-				apiResponse = await submitLeadViaProxy(apiPayload);
-				console.log("API response via proxy:", apiResponse);
-			} else {
-				// Direct API call in production
-				apiResponse = await submitLead(apiPayload);
-				console.log("API response direct:", apiResponse);
-			}
-
-			// Save the API response in the store
-			setApiResponse(apiResponse);
-
-			// Log agent info before saving to help with debugging
-			console.log("Agent info before saving:", {
-				agent: agentInfo.agent,
-				branch: agentInfo.branch,
-			});
-
-			// Extract uuid as pine_client_id and redirect_url as url from the API response
-			const pine_client_id = apiResponse?.data?.uuid || "";
-			const url = apiResponse?.data?.redirect_url || "";
-
-			console.log("Extracted from API response:", {
-				pine_client_id,
-				originalUrl: apiResponse?.data?.redirect_url,
-				transformedUrl: url,
-			});
-
-			// Save to Appwrite with agent info and the extracted fields including transformed URL
-			await saveToAppwrite({
+			// Compose payload for new API
+			const payload = {
 				...formData,
 				agent: agentInfo.agent,
 				branch: agentInfo.branch,
-				quote_id: generatedQuoteId, // Use generated quote ID
-				pine_client_id, // Add the uuid as pine_client_id
-				url, // Use the original redirect_url as url
-			});
+			};
 
-			try {
-				await sendNotificationEmails(formData, agentInfo, pine_client_id, url);
-				console.log("Email notification sent successfully");
-			} catch (emailError) {
-				console.error("Failed to send email notification:", emailError);
-			}
+			const apiResponse = await submitForm(payload);
 
-			// Navigate to success page without resetting form yet
+			setApiResponse(apiResponse);
+
+			// Navigate to success page
 			navigate("/success");
 		} catch (err) {
 			console.error("Submission error:", err);
@@ -267,17 +211,17 @@ const LeadForm = () => {
 								onChange={handleAgentChange}
 								required
 								className={`
-									w-full pr-6 pl-4 pr-10 py-3 rounded-xl border
-									bg-gray-700 focus:bg-gray-600
-									focus:outline-none focus:ring-2 focus:ring-opacity-75
-									text-gray-100 placeholder-gray-400
-									${
-										errors.branch
-											? "border-red-500 ring-red-400"
-											: "border-gray-600 hover:border-gray-500"
-									}
-									disabled:bg-gray-800 disabled:cursor-not-allowed disabled:border-gray-700 disabled:opacity-60
-								`}
+										w-full pr-6 pl-4 pr-10 py-3 rounded-xl border
+										bg-gray-700 focus:bg-gray-600
+										focus:outline-none focus:ring-2 focus:ring-opacity-75
+										text-gray-100 placeholder-gray-400
+										${
+											errors.branch
+												? "border-red-500 ring-red-400"
+												: "border-gray-600 hover:border-gray-500"
+										}
+										disabled:bg-gray-800 disabled:cursor-not-allowed disabled:border-gray-700 disabled:opacity-60
+									`}
 								aria-invalid={!!errors.branch}
 								aria-describedby={errors.branch ? "branch-error" : undefined}
 							>
