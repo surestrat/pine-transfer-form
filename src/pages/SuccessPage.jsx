@@ -15,12 +15,47 @@ const SuccessPage = () => {
 	const [isRedirecting, setIsRedirecting] = useState(false);
 
 	useEffect(() => {
-		// Handle form reset
+		// Check API response directly as a fallback
+		let finalRedirectUrl = redirectUrl;
+
+		// If redirectUrl is not set, try to extract it from apiResponse
+		if (!finalRedirectUrl && apiResponse) {
+			// Try all potential locations for redirect_url
+			if (apiResponse.redirect_url) {
+				finalRedirectUrl = apiResponse.redirect_url;
+				console.log(
+					"Found redirect URL in apiResponse.redirect_url:",
+					finalRedirectUrl
+				);
+			} else if (apiResponse.data && apiResponse.data.redirect_url) {
+				finalRedirectUrl = apiResponse.data.redirect_url;
+				console.log(
+					"Found redirect URL in apiResponse.data.redirect_url:",
+					finalRedirectUrl
+				);
+			} else if (apiResponse.api_response) {
+				// Try to parse if it's a string
+				const parsedResponse =
+					typeof apiResponse.api_response === "string"
+						? JSON.parse(apiResponse.api_response)
+						: apiResponse.api_response;
+
+				if (parsedResponse.data && parsedResponse.data.redirect_url) {
+					finalRedirectUrl = parsedResponse.data.redirect_url;
+					console.log(
+						"Found redirect URL in parsed api_response:",
+						finalRedirectUrl
+					);
+				}
+			}
+		}
+
+		// Handle form reset (do this after extracting the URL)
 		resetForm();
 
-		// Redirect logic only if redirectUrl exists
-		if (redirectUrl) {
-			console.log("Preparing to redirect to:", redirectUrl);
+		// Redirect logic only if finalRedirectUrl exists
+		if (finalRedirectUrl) {
+			console.log("Using redirect URL:", finalRedirectUrl);
 			setIsRedirecting(true);
 
 			// Set up countdown timer
@@ -29,8 +64,8 @@ const SuccessPage = () => {
 					if (prev <= 1) {
 						clearInterval(timer);
 						// Redirect to the URL
-						console.log("Redirecting now to:", redirectUrl);
-						window.location.href = redirectUrl;
+						console.log("Redirecting now to:", finalRedirectUrl);
+						window.location.href = finalRedirectUrl;
 						return 0;
 					}
 					return prev - 1;
@@ -40,15 +75,31 @@ const SuccessPage = () => {
 			// Clean up timer
 			return () => clearInterval(timer);
 		} else {
-			console.log("No redirect URL found in API response");
+			console.log(
+				"No redirect URL found in any response object. API Response:",
+				apiResponse
+			);
 		}
-	}, [redirectUrl, resetForm]);
+	}, [apiResponse, redirectUrl, resetForm]);
 
 	const handleManualRedirect = () => {
-		if (redirectUrl) {
-			window.location.href = redirectUrl;
+		// Try all possible locations for the redirect URL
+		const url =
+			redirectUrl ||
+			(apiResponse && apiResponse.redirect_url) ||
+			(apiResponse && apiResponse.data && apiResponse.data.redirect_url);
+
+		if (url) {
+			window.location.href = url;
 		}
 	};
+
+	// Determine if we have a valid redirect URL from any source
+	const hasRedirectUrl = Boolean(
+		redirectUrl ||
+			(apiResponse && apiResponse.redirect_url) ||
+			(apiResponse && apiResponse.data && apiResponse.data.redirect_url)
+	);
 
 	return (
 		<div className="relative">
@@ -89,7 +140,7 @@ const SuccessPage = () => {
 					transferred and recorded.
 				</p>
 
-				{redirectUrl && isRedirecting && (
+				{hasRedirectUrl && isRedirecting && (
 					<motion.div
 						className="mb-8 p-4 bg-gray-700 rounded-lg mx-auto max-w-md"
 						initial={{ opacity: 0, y: 20 }}
@@ -101,7 +152,7 @@ const SuccessPage = () => {
 							Redirecting to Pineapple in {countdown} seconds...
 						</p>
 						<div className="text-xs text-gray-400 truncate overflow-hidden">
-							{redirectUrl}
+							{redirectUrl || (apiResponse && apiResponse.redirect_url) || ""}
 						</div>
 					</motion.div>
 				)}
@@ -116,7 +167,7 @@ const SuccessPage = () => {
 						Submit Another Transfer
 					</Button>
 
-					{redirectUrl && (
+					{hasRedirectUrl && (
 						<Button
 							onClick={handleManualRedirect}
 							variant="outline"

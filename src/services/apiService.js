@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Get the API URL from environment variables
 const API_URL =
-	import.meta.env.VITE_PINE_API_URL || "https://pta.surestrat.xyz";
+	import.meta.env.VITE_PINE_API_URL || "https://pta.surestrat.xyz/submit-form";
 
 /**
  * Submits the form data to the Pine API endpoint.
@@ -13,7 +13,7 @@ export const submitForm = async (payload) => {
 	try {
 		console.log("Submitting to API URL:", API_URL);
 
-		// Format payload based on server-side expectations
+		// Format payload to match the server SubmissionData schema
 		const formattedPayload = {
 			formData: {
 				first_name: payload.first_name,
@@ -42,32 +42,7 @@ export const submitForm = async (payload) => {
 		// Log successful response
 		console.log("API Response:", response.data);
 
-		// Process the response based on server format
-		const processedResponse = {
-			success: true,
-			data: {},
-		};
-
-		// Extract redirect URL if available
-		if (response.data && response.data.redirect_url) {
-			processedResponse.data.redirect_url = response.data.redirect_url;
-			console.log("Extracted redirect URL:", response.data.redirect_url);
-		} else if (response.data && response.data.api_response) {
-			// Handle nested format where API response might contain redirect in data
-			if (
-				response.data.api_response.data &&
-				response.data.api_response.data.redirect_url
-			) {
-				processedResponse.data.redirect_url =
-					response.data.api_response.data.redirect_url;
-				console.log(
-					"Extracted nested redirect URL:",
-					processedResponse.data.redirect_url
-				);
-			}
-		}
-
-		return processedResponse;
+		return response.data;
 	} catch (error) {
 		// Enhanced error logging
 		console.error("API Error details:", error);
@@ -76,13 +51,6 @@ export const submitForm = async (payload) => {
 			// The server responded with a status code outside the 2xx range
 			console.error("Response status:", error.response.status);
 			console.error("Response data:", error.response.data);
-
-			// Handle specific error status codes
-			if (error.response.status === 405) {
-				throw new Error(
-					"The API endpoint doesn't support this request method. Please check your API configuration."
-				);
-			}
 
 			// Extract error message from response if available
 			const errData = error.response.data;

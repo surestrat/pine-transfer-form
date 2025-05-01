@@ -126,26 +126,37 @@ export const useFormStore = create((set, get) => ({
 	},
 
 	setApiResponse: (response) => {
-		// Extract and set redirect URL from the response structure
+		// Extract redirect URL from the response based on the structure returned by your FastAPI
 		let redirectUrl = null;
 
-		// Try to handle different response formats
 		if (response) {
-			// Option 1: Direct redirect_url property
+			// Direct redirect_url from your FastAPI response
 			if (response.redirect_url) {
 				redirectUrl = response.redirect_url;
 			}
-			// Option 2: Nested in data object
-			else if (response.data && response.data.redirect_url) {
-				redirectUrl = response.data.redirect_url;
-			}
-			// Option 3: Nested in api_response.data
+			// Nested in api_response
 			else if (
 				response.api_response &&
-				response.api_response.data &&
-				response.api_response.data.redirect_url
+				typeof response.api_response === "object"
 			) {
-				redirectUrl = response.api_response.data.redirect_url;
+				// If api_response is already an object
+				if (
+					response.api_response.data &&
+					response.api_response.data.redirect_url
+				) {
+					redirectUrl = response.api_response.data.redirect_url;
+				}
+				// If api_response is a string (JSON)
+				else if (typeof response.api_response === "string") {
+					try {
+						const parsedResponse = JSON.parse(response.api_response);
+						if (parsedResponse.data && parsedResponse.data.redirect_url) {
+							redirectUrl = parsedResponse.data.redirect_url;
+						}
+					} catch (e) {
+						console.error("Error parsing API response:", e);
+					}
+				}
 			}
 		}
 
