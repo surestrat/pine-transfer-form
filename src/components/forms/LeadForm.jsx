@@ -80,9 +80,10 @@ const LeadForm = () => {
 			};
 
 			// Log payload for debugging
-			console.log("Sending payload to API:", payload);
+			console.log("Preparing payload:", payload);
 
 			const apiResponse = await submitForm(payload);
+			console.log("Received API response:", apiResponse);
 
 			// Store the API response in the form store
 			setApiResponse(apiResponse);
@@ -90,20 +91,29 @@ const LeadForm = () => {
 			// Navigate to success page
 			navigate("/success");
 		} catch (err) {
-			console.error("Submission error:", err);
+			console.error("Form submission error:", err);
 
-			// Show a user-friendly error message
-			setError(
-				err.message ||
-					"There was an error submitting your information. Please check your details and try again."
-			);
+			// Create a user-friendly error message
+			let errorMessage =
+				"There was an error submitting your information. Please try again later.";
 
-			// If it's a server error, add a more specific message
-			if (err.message.includes("405") || err.message.includes("method")) {
-				setError(
-					"The API endpoint configuration is incorrect. Please contact support with this error: Method Not Allowed (405)."
-				);
+			if (err.message) {
+				if (
+					err.message.includes("Network Error") ||
+					err.message.includes("internet")
+				) {
+					errorMessage = "Please check your internet connection and try again.";
+				} else if (err.message.includes("timeout")) {
+					errorMessage = "The request timed out. Please try again later.";
+				} else if (err.message.includes("405")) {
+					errorMessage =
+						"Technical error: The API configuration needs to be updated. Please contact support.";
+				} else {
+					errorMessage = err.message;
+				}
 			}
+
+			setError(errorMessage);
 		} finally {
 			setIsSubmitting(false);
 		}

@@ -126,8 +126,31 @@ export const useFormStore = create((set, get) => ({
 	},
 
 	setApiResponse: (response) => {
-		// Extract and set redirect URL if it exists in the response
-		const redirectUrl = response?.data?.redirect_url || null;
+		// Extract and set redirect URL from the response structure
+		let redirectUrl = null;
+
+		// Try to handle different response formats
+		if (response) {
+			// Option 1: Direct redirect_url property
+			if (response.redirect_url) {
+				redirectUrl = response.redirect_url;
+			}
+			// Option 2: Nested in data object
+			else if (response.data && response.data.redirect_url) {
+				redirectUrl = response.data.redirect_url;
+			}
+			// Option 3: Nested in api_response.data
+			else if (
+				response.api_response &&
+				response.api_response.data &&
+				response.api_response.data.redirect_url
+			) {
+				redirectUrl = response.api_response.data.redirect_url;
+			}
+		}
+
+		console.log("Setting redirect URL:", redirectUrl);
+
 		set({
 			apiResponse: response,
 			redirectUrl: redirectUrl,

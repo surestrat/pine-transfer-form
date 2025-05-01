@@ -1,6 +1,6 @@
 import axios from "axios";
 
-// Ensure we use the correct endpoint from env variable - don't append paths
+// Get the API URL from environment variables
 const API_URL =
 	import.meta.env.VITE_PINE_API_URL || "https://pta.surestrat.xyz";
 
@@ -13,8 +13,26 @@ export const submitForm = async (payload) => {
 	try {
 		console.log("Submitting to API URL:", API_URL);
 
+		// Format payload based on server-side expectations
+		const formattedPayload = {
+			formData: {
+				first_name: payload.first_name,
+				last_name: payload.last_name,
+				email: payload.email,
+				contact_number: payload.contact_number,
+				id_number: payload.id_number || undefined,
+				quote_id: payload.quote_id || undefined,
+			},
+			agentInfo: {
+				agent: payload.agent,
+				branch: payload.branch,
+			},
+		};
+
+		console.log("Sending formatted payload:", formattedPayload);
+
 		// Make the API request
-		const response = await axios.post(API_URL, payload, {
+		const response = await axios.post(API_URL, formattedPayload, {
 			headers: {
 				"Content-Type": "application/json",
 				Accept: "application/json",
@@ -24,16 +42,32 @@ export const submitForm = async (payload) => {
 		// Log successful response
 		console.log("API Response:", response.data);
 
-		// Validate and return the response
-		if (response.data) {
-			// Log the redirect URL for debugging if present
-			if (response.data.data && response.data.data.redirect_url) {
-				console.log("Received redirect URL:", response.data.data.redirect_url);
+		// Process the response based on server format
+		const processedResponse = {
+			success: true,
+			data: {},
+		};
+
+		// Extract redirect URL if available
+		if (response.data && response.data.redirect_url) {
+			processedResponse.data.redirect_url = response.data.redirect_url;
+			console.log("Extracted redirect URL:", response.data.redirect_url);
+		} else if (response.data && response.data.api_response) {
+			// Handle nested format where API response might contain redirect in data
+			if (
+				response.data.api_response.data &&
+				response.data.api_response.data.redirect_url
+			) {
+				processedResponse.data.redirect_url =
+					response.data.api_response.data.redirect_url;
+				console.log(
+					"Extracted nested redirect URL:",
+					processedResponse.data.redirect_url
+				);
 			}
-			return response.data;
 		}
 
-		return response.data;
+		return processedResponse;
 	} catch (error) {
 		// Enhanced error logging
 		console.error("API Error details:", error);
@@ -43,10 +77,10 @@ export const submitForm = async (payload) => {
 			console.error("Response status:", error.response.status);
 			console.error("Response data:", error.response.data);
 
-			// Handle 405 Method Not Allowed error specifically
+			// Handle specific error status codes
 			if (error.response.status === 405) {
 				throw new Error(
-					"The API endpoint doesn't support this request method. Please contact support."
+					"The API endpoint doesn't support this request method. Please check your API configuration."
 				);
 			}
 

@@ -20,6 +20,7 @@ const SuccessPage = () => {
 
 		// Redirect logic only if redirectUrl exists
 		if (redirectUrl) {
+			console.log("Preparing to redirect to:", redirectUrl);
 			setIsRedirecting(true);
 
 			// Set up countdown timer
@@ -28,6 +29,7 @@ const SuccessPage = () => {
 					if (prev <= 1) {
 						clearInterval(timer);
 						// Redirect to the URL
+						console.log("Redirecting now to:", redirectUrl);
 						window.location.href = redirectUrl;
 						return 0;
 					}
@@ -37,6 +39,8 @@ const SuccessPage = () => {
 
 			// Clean up timer
 			return () => clearInterval(timer);
+		} else {
+			console.log("No redirect URL found in API response");
 		}
 	}, [redirectUrl, resetForm]);
 
