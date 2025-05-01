@@ -72,25 +72,38 @@ const LeadForm = () => {
 		setIsSubmitting(true);
 
 		try {
-			// Compose payload for new API
+			// Compose payload for API
 			const payload = {
 				...formData,
 				agent: agentInfo.agent,
 				branch: agentInfo.branch,
 			};
 
+			// Log payload for debugging
+			console.log("Sending payload to API:", payload);
+
 			const apiResponse = await submitForm(payload);
 
+			// Store the API response in the form store
 			setApiResponse(apiResponse);
 
 			// Navigate to success page
 			navigate("/success");
 		} catch (err) {
 			console.error("Submission error:", err);
+
+			// Show a user-friendly error message
 			setError(
 				err.message ||
 					"There was an error submitting your information. Please check your details and try again."
 			);
+
+			// If it's a server error, add a more specific message
+			if (err.message.includes("405") || err.message.includes("method")) {
+				setError(
+					"The API endpoint configuration is incorrect. Please contact support with this error: Method Not Allowed (405)."
+				);
+			}
 		} finally {
 			setIsSubmitting(false);
 		}

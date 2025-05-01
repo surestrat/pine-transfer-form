@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle, ArrowRight, RefreshCw, ExternalLink } from "lucide-react"; // Added ExternalLink
+import { CheckCircle, ArrowRight, RefreshCw, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../components/ui/Logo";
 import { Button } from "../components/ui/Button";
@@ -10,23 +10,25 @@ const SuccessPage = () => {
 	const navigate = useNavigate();
 	const resetForm = useFormStore((state) => state.resetForm);
 	const apiResponse = useFormStore((state) => state.apiResponse);
+	const redirectUrl = useFormStore((state) => state.redirectUrl);
 	const [countdown, setCountdown] = useState(5);
-	const [redirectUrl, setRedirectUrl] = useState("");
+	const [isRedirecting, setIsRedirecting] = useState(false);
 
 	useEffect(() => {
-		// Extract and transform redirect URL if available
-		if (apiResponse?.data?.redirect_url) {
-			setRedirectUrl(apiResponse.data.redirect_url);
+		// Handle form reset
+		resetForm();
+
+		// Redirect logic only if redirectUrl exists
+		if (redirectUrl) {
+			setIsRedirecting(true);
 
 			// Set up countdown timer
 			const timer = setInterval(() => {
 				setCountdown((prev) => {
 					if (prev <= 1) {
 						clearInterval(timer);
-						// Redirect to the transformed URL
-						window.location.href = setRedirectUrl(
-							apiResponse.data.redirect_url
-						);
+						// Redirect to the URL
+						window.location.href = redirectUrl;
 						return 0;
 					}
 					return prev - 1;
@@ -36,10 +38,13 @@ const SuccessPage = () => {
 			// Clean up timer
 			return () => clearInterval(timer);
 		}
+	}, [redirectUrl, resetForm]);
 
-		// Still reset form even if no redirect URL
-		resetForm();
-	}, [apiResponse, resetForm]);
+	const handleManualRedirect = () => {
+		if (redirectUrl) {
+			window.location.href = redirectUrl;
+		}
+	};
 
 	return (
 		<div className="relative">
@@ -80,7 +85,7 @@ const SuccessPage = () => {
 					transferred and recorded.
 				</p>
 
-				{redirectUrl && (
+				{redirectUrl && isRedirecting && (
 					<motion.div
 						className="mb-8 p-4 bg-gray-700 rounded-lg mx-auto max-w-md"
 						initial={{ opacity: 0, y: 20 }}
@@ -91,7 +96,9 @@ const SuccessPage = () => {
 							<ExternalLink size={16} className="mr-2" />
 							Redirecting to Pineapple in {countdown} seconds...
 						</p>
-						<div className="text-xs text-gray-400 truncate">{redirectUrl}</div>
+						<div className="text-xs text-gray-400 truncate overflow-hidden">
+							{redirectUrl}
+						</div>
 					</motion.div>
 				)}
 
@@ -107,7 +114,7 @@ const SuccessPage = () => {
 
 					{redirectUrl && (
 						<Button
-							onClick={() => (window.location.href = redirectUrl)}
+							onClick={handleManualRedirect}
 							variant="outline"
 							className="mx-auto"
 						>
