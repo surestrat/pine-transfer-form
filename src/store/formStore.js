@@ -36,7 +36,7 @@ const initialAgentInfo = {
 
 export const useFormStore = create((set, get) => ({
 	customer_info: initialFormData,
-	agent_Info: initialAgentInfo,
+	agent_info: initialAgentInfo,
 	errors: {},
 	apiResponse: null,
 	redirectUrl: null, // Add redirectUrl state to store the URL separately
@@ -66,7 +66,7 @@ export const useFormStore = create((set, get) => ({
 
 	updateAgentInfo: (field, value) => {
 		set((state) => {
-			const updatedAgentInfo = { ...state.agent_Info, [field]: value };
+			const updatedAgentInfo = { ...state.agent_info, [field]: value };
 
 			const updatedErrors = { ...state.errors };
 
@@ -81,14 +81,14 @@ export const useFormStore = create((set, get) => ({
 			}
 
 			return {
-				agent_Info: updatedAgentInfo,
+					agent_info: updatedAgentInfo,
 				errors: updatedErrors,
 			};
 		});
 	},
 
 	validateForm: () => {
-		const { customer_info, agent_Info } = get();
+		const { customer_info, agent_info } = get();
 		const updatedErrors = {};
 		let isValid = true;
 
@@ -107,7 +107,7 @@ export const useFormStore = create((set, get) => ({
 		}
 
 		try {
-			agentSchema.parse(agent_Info);
+			agentSchema.parse(agent_info);
 		} catch (error) {
 			if (error instanceof z.ZodError) {
 				error.errors.forEach((err) => {

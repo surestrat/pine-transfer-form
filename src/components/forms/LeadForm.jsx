@@ -23,7 +23,7 @@ const branchOptions = [
 	{ value: "Lenasia-Tariq", label: "Lenasia-Tariq" },
 	{ value: "Rosebank-Irshad", label: "Rosebank-Irshad" },
 	{ value: "Vereeniging-Ahmed", label: "Vereeniging-Ahmed" },
-	{},
+	// Remove the empty object
 	// Add more branches as needed
 ];
 
@@ -75,7 +75,7 @@ const LeadForm = () => {
 			// Compose payload for API
 			const payload = {
 				...customer_info,
-				agent_name: agent_Info.agent_name,
+				agent_name: agent_info.agent_name,
 				branch_name: agent_info.branch_name,
 			};
 
@@ -134,7 +134,7 @@ const LeadForm = () => {
 					<InputField
 						label="First Name"
 						name="first_name"
-						value={formData.first_name}
+						value={customer_info.first_name}
 						onChange={handleChange}
 						error={errors.first_name}
 						required
@@ -149,7 +149,7 @@ const LeadForm = () => {
 					<InputField
 						label="Last Name"
 						name="last_name"
-						value={formData.last_name}
+						value={customer_info.last_name}
 						onChange={handleChange}
 						error={errors.last_name}
 						required
@@ -166,7 +166,7 @@ const LeadForm = () => {
 					label="Email Address"
 					name="email"
 					type="email"
-					value={formData.email}
+					value={customer_info.email}
 					onChange={handleChange}
 					error={errors.email}
 					required
@@ -181,7 +181,7 @@ const LeadForm = () => {
 				<InputField
 					label="ID Number"
 					name="id_number"
-					value={formData.id_number}
+					value={customer_info.id_number}
 					onChange={handleChange}
 					error={errors.id_number}
 					icon={FileText}
@@ -196,7 +196,7 @@ const LeadForm = () => {
 					label="Contact Number"
 					name="contact_number"
 					type="tel"
-					value={formData.contact_number}
+					value={customer_info.contact_number}
 					onChange={handleChange}
 					error={errors.contact_number}
 					required
@@ -213,7 +213,7 @@ const LeadForm = () => {
 					<InputField
 						label="Agent Name"
 						name="agent_name"
-						value={agent_Info.agent_name}
+						value={agent_info.agent_name}
 						onChange={handleAgentChange}
 						error={errors.agent_name}
 						required
@@ -229,8 +229,8 @@ const LeadForm = () => {
 						<div className="relative">
 							<select
 								id="branch_name"
-								name="branch"
-								value={agent_Info.branch_name}
+								name="branch_name"
+								value={agent_info.branch_name}
 								onChange={handleAgentChange}
 								required
 								className={`
