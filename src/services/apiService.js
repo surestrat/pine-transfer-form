@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Get the API URL from environment variables
 const API_URL =
-	import.meta.env.VITE_PINE_API_URL || "https://pta.surestrat.xyz/submit-form";
+	import.meta.env.VITE_PINE_API_URL || "https://api.surestrat.xyz/api/v1/transfer";
 
 /**
  * Submits the form data to the Pine API endpoint.
