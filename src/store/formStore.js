@@ -16,8 +16,8 @@ const formSchema = z.object({
 });
 
 const agentSchema = z.object({
-	agent: z.string().min(2, "Agent name must be at least 2 characters"),
-	branch: z.string().min(2, "Office name must be at least 2 characters"),
+	agent_name: z.string().min(2, "Agent name must be at least 2 characters"),
+	branch_name: z.string().min(2, "Office name must be at least 2 characters"),
 });
 
 const initialFormData = {
@@ -30,8 +30,8 @@ const initialFormData = {
 };
 
 const initialAgentInfo = {
-	agent: "",
-	branch: "",
+	agent_name: "",
+	branch_name: "",
 };
 
 export const useFormStore = create((set, get) => ({
