@@ -234,7 +234,7 @@ const LeadForm = () => {
 								onChange={handleAgentChange}
 								required
 								className={`
-										w-full pr-6 pl-4 pr-10 py-3 rounded-xl border
+										w-full pr-6 pl-4 py-3 rounded-xl border
 										bg-gray-700 focus:bg-gray-600
 										focus:outline-none focus:ring-2 focus:ring-opacity-75
 										text-gray-100 placeholder-gray-400
@@ -246,7 +246,9 @@ const LeadForm = () => {
 										disabled:bg-gray-800 disabled:cursor-not-allowed disabled:border-gray-700 disabled:opacity-60
 									`}
 								aria-invalid={!!errors.branch_name}
-								aria-describedby={errors.branch_name ? "branch-error" : undefined}
+								aria-describedby={
+									errors.branch_name ? "branch-error" : undefined
+								}
 							>
 								{branchOptions.map((option) => (
 									<option key={option.value} value={option.value}>

@@ -10,16 +10,6 @@ export default defineConfig({
 		tailwindcss(),
 		// Email middleware plugin removed - will be implemented later
 	],
-	server: {
-		// Fix HMR connection issues
-		hmr: {
-			timeout: 5000,
-		},
-		// Setup proxy for the gw-test.pineapple.co.za API calls
-		proxy: {
-			"/api": "http://localhost:3001",
-		},
-	},
 	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "./src"),
