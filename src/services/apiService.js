@@ -15,7 +15,7 @@ export const submitForm = async (payload) => {
 
 		// Format payload to match the server SubmissionData schema
 		const formattedPayload = {
-			formData: {
+			customer_info: {
 				first_name: payload.first_name,
 				last_name: payload.last_name,
 				email: payload.email,
@@ -23,9 +23,9 @@ export const submitForm = async (payload) => {
 				id_number: payload.id_number || undefined,
 				quote_id: payload.quote_id || undefined,
 			},
-			agentInfo: {
-				agent: payload.agent,
-				branch: payload.branch,
+			agent_info: {
+				agent_name: payload.agent,
+				branch_name: payload.branch,
 			},
 		};
 
