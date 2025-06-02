@@ -35,15 +35,15 @@ const initialAgentInfo = {
 };
 
 export const useFormStore = create((set, get) => ({
-	formData: initialFormData,
-	agentInfo: initialAgentInfo,
+	customer_info: initialFormData,
+	agent_Info: initialAgentInfo,
 	errors: {},
 	apiResponse: null,
 	redirectUrl: null, // Add redirectUrl state to store the URL separately
 
 	updateField: (field, value) => {
 		set((state) => {
-			const updatedFormData = { ...state.formData, [field]: value };
+			const updatedFormData = { ...state.customer_info, [field]: value };
 
 			const updatedErrors = { ...state.errors };
 
@@ -58,7 +58,7 @@ export const useFormStore = create((set, get) => ({
 			}
 
 			return {
-				formData: updatedFormData,
+				customer_info: updatedFormData,
 				errors: updatedErrors,
 			};
 		});
@@ -66,7 +66,7 @@ export const useFormStore = create((set, get) => ({
 
 	updateAgentInfo: (field, value) => {
 		set((state) => {
-			const updatedAgentInfo = { ...state.agentInfo, [field]: value };
+			const updatedAgentInfo = { ...state.agent_Info, [field]: value };
 
 			const updatedErrors = { ...state.errors };
 
@@ -81,19 +81,19 @@ export const useFormStore = create((set, get) => ({
 			}
 
 			return {
-				agentInfo: updatedAgentInfo,
+				agent_Info: updatedAgentInfo,
 				errors: updatedErrors,
 			};
 		});
 	},
 
 	validateForm: () => {
-		const { formData, agentInfo } = get();
+		const { customer_info, agent_Info } = get();
 		const updatedErrors = {};
 		let isValid = true;
 
 		try {
-			formSchema.parse(formData);
+			formSchema.parse(customer_info);
 		} catch (error) {
 			if (error instanceof z.ZodError) {
 				error.errors.forEach((err) => {
@@ -107,7 +107,7 @@ export const useFormStore = create((set, get) => ({
 		}
 
 		try {
-			agentSchema.parse(agentInfo);
+			agentSchema.parse(agent_Info);
 		} catch (error) {
 			if (error instanceof z.ZodError) {
 				error.errors.forEach((err) => {
@@ -170,8 +170,8 @@ export const useFormStore = create((set, get) => ({
 
 	resetForm: () => {
 		set({
-			formData: initialFormData,
-			agentInfo: initialAgentInfo,
+			customer_info: initialFormData,
+			agent_info: initialAgentInfo,
 			errors: {},
 			apiResponse: null,
 			redirectUrl: null, // Also reset redirect URL
