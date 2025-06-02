@@ -24,8 +24,8 @@ export const submitForm = async (payload) => {
 				quote_id: payload.quote_id || undefined,
 			},
 			agent_info: {
-				agent_name: payload.agent,
-				branch_name: payload.branch,
+				agent_name: payload.agent_name,
+				branch_name: payload.branch_name,
 			},
 		};
 
