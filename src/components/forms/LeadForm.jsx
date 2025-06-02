@@ -33,8 +33,8 @@ const LeadForm = () => {
 	const [error, setError] = useState(null);
 
 	const {
-		formData,
-		agentInfo,
+		customer_info,
+		agent_info,
 		updateField,
 		updateAgentInfo,
 		errors,
@@ -74,9 +74,9 @@ const LeadForm = () => {
 		try {
 			// Compose payload for API
 			const payload = {
-				...formData,
-				agent: agentInfo.agent,
-				branch: agentInfo.branch,
+				...customer_info,
+				agent_name: agent_Info.agent_name,
+				branch_name: agent_info.branch_name,
 			};
 
 			// Log payload for debugging
@@ -212,25 +212,25 @@ const LeadForm = () => {
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
 					<InputField
 						label="Agent Name"
-						name="agent"
-						value={agentInfo.agent}
+						name="agent_name"
+						value={agent_Info.agent_name}
 						onChange={handleAgentChange}
-						error={errors.agent}
+						error={errors.agent_name}
 						required
 						icon={User}
 					/>
 					<div className="mb-5">
 						<label
-							htmlFor="branch"
+							htmlFor="branch_name"
 							className="block text-sm font-medium text-gray-300 mb-1.5"
 						>
 							Office <span className="text-red-400">*</span>
 						</label>
 						<div className="relative">
 							<select
-								id="branch"
+								id="branch_name"
 								name="branch"
-								value={agentInfo.branch}
+								value={agent_Info.branch_name}
 								onChange={handleAgentChange}
 								required
 								className={`
@@ -239,14 +239,14 @@ const LeadForm = () => {
 										focus:outline-none focus:ring-2 focus:ring-opacity-75
 										text-gray-100 placeholder-gray-400
 										${
-											errors.branch
+											errors.branch_name
 												? "border-red-500 ring-red-400"
 												: "border-gray-600 hover:border-gray-500"
 										}
 										disabled:bg-gray-800 disabled:cursor-not-allowed disabled:border-gray-700 disabled:opacity-60
 									`}
-								aria-invalid={!!errors.branch}
-								aria-describedby={errors.branch ? "branch-error" : undefined}
+								aria-invalid={!!errors.branch_name}
+								aria-describedby={errors.branch_name ? "branch-error" : undefined}
 							>
 								{branchOptions.map((option) => (
 									<option key={option.value} value={option.value}>
@@ -255,13 +255,13 @@ const LeadForm = () => {
 								))}
 							</select>
 						</div>
-						{errors.branch && (
+						{errors.branch_name && (
 							<p
 								id="branch-error"
 								className="mt-1.5 text-xs text-red-400"
 								role="alert"
 							>
-								{errors.branch}
+								{errors.branch_name}
 							</p>
 						)}
 					</div>
