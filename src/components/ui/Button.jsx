@@ -14,11 +14,11 @@ export const Button = ({
 
 	const variantStyles = {
 		primary:
-			"bg-primary-500 hover:bg-primary-600 text-white focus:ring-primary-400", // Keep primary as is
+			"bg-teal-600 hover:bg-teal-500 text-white focus:ring-teal-400 border border-teal-500/30", // Teal primary button
 		secondary:
-			"bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 text-white focus:ring-secondary-400", // Keep secondary as is
+			"bg-gradient-to-r from-[#131620] to-[#1c2130] hover:from-[#1c2130] hover:to-[#252b3d] text-white border border-[#2a3142] focus:ring-[#2a3142]", // Modern dark gradient
 		outline:
-			"border border-primary-500 bg-transparent hover:bg-primary-500 hover:bg-opacity-10 text-primary-300 focus:ring-primary-400 shadow-soft hover:shadow-medium", // Adjusted for dark: transparent bg, light text, subtle hover
+			"border border-teal-500/50 bg-transparent hover:bg-teal-500/10 text-teal-300 focus:ring-teal-400/30 shadow-soft hover:shadow-medium", // Teal outline
 	};
 
 	const disabledStyles =

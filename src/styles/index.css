@@ -6,7 +6,7 @@
 /* Apply base styles */
 @layer base {
 	body {
-		@apply font-sans bg-[#161b24] text-gray-300 antialiased; /* Dark background, light base text */
+		@apply font-sans bg-[#0a0c10] text-gray-300 antialiased; /* Deeper black background, light base text */
 	}
 	h1,
 	h2,
@@ -14,7 +14,24 @@
 	h4,
 	h5,
 	h6 {
-		@apply font-semibold text-gray-100; /* Lighter headings for contrast */
+		@apply font-semibold text-gray-50; /* Even lighter headings for better contrast */
 	}
-	/* Add other base styles if needed */
+	a {
+		@apply text-teal-400 hover:text-teal-300 transition-colors;
+	}
+	input,
+	select,
+	textarea {
+		@apply bg-[#131620] border-[#2a3142] focus:border-teal-500 focus:ring focus:ring-teal-500/20;
+	}
+	/* Modern scrollbar */
+	::-webkit-scrollbar {
+		@apply w-2;
+	}
+	::-webkit-scrollbar-track {
+		@apply bg-[#131620];
+	}
+	::-webkit-scrollbar-thumb {
+		@apply bg-[#2a3142] rounded-full hover:bg-[#394152];
+	}
 }

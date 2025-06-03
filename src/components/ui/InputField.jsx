@@ -65,34 +65,34 @@ export const InputField = ({
 					className={`
             w-full ${hasIcon ? "pl-11" : "pl-4"} pr-10 py-3 rounded-xl border
             transition-all duration-200 ease-in-out
-            bg-gray-700 focus:bg-gray-600 /* Dark input background */
-            focus:outline-none focus:ring-2 focus:ring-opacity-75
-            text-gray-100 placeholder-gray-400 /* Light text, muted placeholder */
+            bg-[#131620] focus:bg-[#1c2130] /* Modern darker input background */
+            focus:outline-none focus:ring-2 focus:ring-opacity-75 shadow-inner
+            text-gray-100 placeholder-gray-500 /* Light text, muted placeholder */
             ${
 							focused
-								? "border-primary-500 ring-primary-400" // Keep primary focus ring
-								: "border-gray-600 hover:border-gray-500" // Darker borders
+								? "border-teal-500 ring-teal-500/20" // Modern teal focus ring
+								: "border-[#2a3142] hover:border-[#3a4154]" // More distinct border colors
 						}
             ${
 							error
-								? "border-red-500 ring-red-400" // Keep error colors for visibility
+								? "border-red-500/70 ring-red-500/20" // Slightly muted error colors for better dark theme harmony
 								: ""
 						}
             ${
 							isValid
-								? "border-green-500 ring-green-400" // Keep valid colors for visibility
+								? "border-teal-600/70 ring-teal-500/20" // Use teal instead of green for consistency
 								: ""
 						}
-            disabled:bg-gray-800 disabled:cursor-not-allowed disabled:border-gray-700 disabled:opacity-60 /* Darker disabled state */
+            disabled:bg-[#0f1219] disabled:cursor-not-allowed disabled:border-[#20253a] disabled:opacity-60 /* Even darker disabled state */
           `}
 					whileFocus={{ scale: 1.01 }}
 				/>
 
 				{/* Validation Icons positioned absolutely on the right */}
 				<div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-					{/* Keep validation icon colors for visibility */}
-					{isValid && <Check className="h-5 w-5 text-green-500" />}
-					{error && <AlertCircle className="h-5 w-5 text-red-500" />}
+					{/* Use teal for valid state */}
+					{isValid && <Check className="h-5 w-5 text-teal-400" />}
+					{error && <AlertCircle className="h-5 w-5 text-red-400" />}
 				</div>
 			</div>
 			<AnimatePresence>

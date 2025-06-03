@@ -15,12 +15,9 @@ const FormPage = () => {
 				transition={{ delay: 0.1, ease: "easeOut" }}
 			>
 				<Logo size={32} />
-				<div className="flex items-center text-sm text-gray-400">
-					{" "}
-					{/* Muted light text */}
-					<Lock size={14} className="mr-1.5 text-gray-500" />{" "}
-					{/* Darker muted icon */}
-					<span>Secure Connection</span>
+				<div className="flex items-center text-sm text-teal-400 bg-[#131620]/70 backdrop-blur-sm px-3.5 py-2 rounded-full border border-teal-500/20 shadow-inner">
+					<Lock size={14} className="mr-2 text-teal-500" />
+					<span className="font-medium tracking-tight">Secure Connection</span>
 				</div>
 			</motion.div>
 
@@ -30,21 +27,20 @@ const FormPage = () => {
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ delay: 0.2, ease: "easeOut" }}
 			>
-				<h1 className="text-3xl sm:text-4xl font-bold text-gray-300 mb-3">
+				<h1 className="text-3xl sm:text-4xl font-bold text-white mb-3 tracking-tight">
 					{" "}
-					{/* Light heading */}
-					Pineapple Customer Information Transfer
+					<span className="text-teal-400">Pineapple</span> Customer Information
+					Transfer
 				</h1>
-				<p className="text-gray-300 max-w-xl mx-auto">
+				<p className="text-gray-400 max-w-xl mx-auto">
 					{" "}
-					{/* Standard light text */}
 					Please fill out the secure form below to transfer the customer details
-					accurately.
+					accurately and quickly.
 				</p>
 			</motion.div>
 
 			<motion.div
-				className="bg-gray-800 rounded-2xl shadow-card p-8 sm:p-10" // Dark card background
+				className="bg-[#131620] rounded-2xl shadow-xl p-8 sm:p-10 border border-[#2a3142] backdrop-blur-sm" // Modern dark card with border and blur effect
 				initial={{ y: 20, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ delay: 0.3, ease: "easeOut" }}

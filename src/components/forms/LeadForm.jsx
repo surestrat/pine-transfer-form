@@ -121,8 +121,10 @@ const LeadForm = () => {
 
 	return (
 		<form onSubmit={handleSubmit} className="space-y-5">
-			<h2 className="text-xl font-semibold text-gray-200 border-b border-gray-600 pb-2 mb-6">
-				{/* Lighter heading, darker border */}
+			<h2 className="text-xl font-semibold text-gray-100 border-b border-[#2a3142] pb-2 mb-6 flex items-center">
+				<span className="bg-teal-500/10 text-teal-400 p-1.5 rounded-lg mr-2">
+					<User size={18} />
+				</span>
 				Customer Details
 			</h2>
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
@@ -205,8 +207,10 @@ const LeadForm = () => {
 			</motion.div>
 			<div className="pt-8 mt-8 border-t border-gray-700">
 				{/* Darker top border */}
-				<h2 className="text-xl font-semibold text-gray-200 border-b border-gray-600 pb-2 mb-6">
-					{/* Lighter heading, darker border */}
+				<h2 className="text-xl font-semibold text-gray-100 border-b border-[#2a3142] pb-2 mb-6 flex items-center">
+					<span className="bg-teal-500/10 text-teal-400 p-1.5 rounded-lg mr-2">
+						<FileText size={18} />
+					</span>
 					Agent Information
 				</h2>
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
@@ -234,16 +238,16 @@ const LeadForm = () => {
 								onChange={handleAgentChange}
 								required
 								className={`
-										w-full pr-6 pl-4 py-3 rounded-xl border
-										bg-gray-700 focus:bg-gray-600
+										w-full pr-6 pl-4 py-3 rounded-xl border shadow-inner
+										bg-[#131620] focus:bg-[#1c2130]
 										focus:outline-none focus:ring-2 focus:ring-opacity-75
-										text-gray-100 placeholder-gray-400
+										text-gray-100 placeholder-gray-500
 										${
 											errors.branch_name
-												? "border-red-500 ring-red-400"
-												: "border-gray-600 hover:border-gray-500"
+												? "border-red-500/70 ring-red-500/20"
+												: "border-[#2a3142] hover:border-[#3a4154] focus:border-teal-500 focus:ring-teal-500/20"
 										}
-										disabled:bg-gray-800 disabled:cursor-not-allowed disabled:border-gray-700 disabled:opacity-60
+										disabled:bg-[#0f1219] disabled:cursor-not-allowed disabled:border-[#20253a] disabled:opacity-60
 									`}
 								aria-invalid={!!errors.branch_name}
 								aria-describedby={
@@ -276,7 +280,7 @@ const LeadForm = () => {
 						initial={{ opacity: 0, y: -10 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0 }}
-						className="bg-red-900 bg-opacity-30 border border-red-500 border-opacity-50 p-4 rounded-xl mt-6" // Darker error background/border
+						className="bg-red-900/20 border border-red-500/30 p-4 rounded-xl mt-6 shadow-inner"
 						role="alert"
 					>
 						<div className="flex items-start">
@@ -296,7 +300,7 @@ const LeadForm = () => {
 					type="submit"
 					variant="primary"
 					disabled={isSubmitting}
-					className="w-full sm:w-auto min-w-[180px] bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-600 rounded-lg shadow-sm transition duration-200 ease-in-out flex items-center justify-center"
+					className="w-full sm:w-auto min-w-[180px]"
 				>
 					{isSubmitting ? (
 						<>

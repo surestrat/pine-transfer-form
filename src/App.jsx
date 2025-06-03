@@ -14,8 +14,8 @@ function App() {
 				{" "}
 				{/* Wrap with ErrorBoundary */}
 				<div
-					className="min-h-screen relative overflow-hidden font-sans bg-[#161b24]"
-					style={{ background: "#1b263b" }} // Use direct hex color
+					className="min-h-screen relative overflow-hidden font-sans bg-[#0a0c10]"
+					style={{ background: "#0a0c10" }} // Deeper black background
 				>
 					{/* Updated dark background */}
 					<GradientBackground />
