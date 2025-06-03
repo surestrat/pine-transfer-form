@@ -15,42 +15,66 @@ const SuccessPage = () => {
 	const [isRedirecting, setIsRedirecting] = useState(false);
 
 	useEffect(() => {
+		// Store values locally to prevent issues with state reset
+		const storedRedirectUrl = redirectUrl;
+		const storedApiResponse = apiResponse;
+
 		// Check API response directly as a fallback
-		let finalRedirectUrl = redirectUrl;
+		let finalRedirectUrl = storedRedirectUrl;
+
+		console.log("Initial redirect check:", {
+			redirectUrl: storedRedirectUrl,
+			apiResponse: storedApiResponse,
+		});
 
 		// If redirectUrl is not set, try to extract it from apiResponse
-		if (!finalRedirectUrl && apiResponse) {
+		if (!finalRedirectUrl && storedApiResponse) {
 			// Try all potential locations for redirect_url
-			if (apiResponse.redirect_url) {
-				finalRedirectUrl = apiResponse.redirect_url;
+			if (storedApiResponse.redirect_url) {
+				finalRedirectUrl = storedApiResponse.redirect_url;
 				console.log(
 					"Found redirect URL in apiResponse.redirect_url:",
 					finalRedirectUrl
 				);
-			} else if (apiResponse.data && apiResponse.data.redirect_url) {
-				finalRedirectUrl = apiResponse.data.redirect_url;
+			} else if (
+				storedApiResponse.data &&
+				storedApiResponse.data.redirect_url
+			) {
+				finalRedirectUrl = storedApiResponse.data.redirect_url;
 				console.log(
 					"Found redirect URL in apiResponse.data.redirect_url:",
 					finalRedirectUrl
 				);
-			} else if (apiResponse.api_response) {
+			} else if (storedApiResponse.api_response) {
 				// Try to parse if it's a string
-				const parsedResponse =
-					typeof apiResponse.api_response === "string"
-						? JSON.parse(apiResponse.api_response)
-						: apiResponse.api_response;
+				try {
+					const parsedResponse =
+						typeof storedApiResponse.api_response === "string"
+							? JSON.parse(storedApiResponse.api_response)
+							: storedApiResponse.api_response;
 
-				if (parsedResponse.data && parsedResponse.data.redirect_url) {
-					finalRedirectUrl = parsedResponse.data.redirect_url;
-					console.log(
-						"Found redirect URL in parsed api_response:",
-						finalRedirectUrl
-					);
+					if (parsedResponse.data && parsedResponse.data.redirect_url) {
+						finalRedirectUrl = parsedResponse.data.redirect_url;
+						console.log(
+							"Found redirect URL in parsed api_response:",
+							finalRedirectUrl
+						);
+					}
+				} catch (error) {
+					console.error("Error parsing API response:", error);
 				}
 			}
 		}
 
-		// Handle form reset (do this after extracting the URL)
+		// Store the URL in session storage before resetting the form
+		if (finalRedirectUrl) {
+			sessionStorage.setItem("redirectUrl", finalRedirectUrl);
+		} else {
+			// Try to get from session storage as last resort
+			finalRedirectUrl = sessionStorage.getItem("redirectUrl");
+		}
+
+		// Handle form reset (do this after extracting and saving the URL)
 		resetForm();
 
 		// Redirect logic only if finalRedirectUrl exists
@@ -77,17 +101,18 @@ const SuccessPage = () => {
 		} else {
 			console.log(
 				"No redirect URL found in any response object. API Response:",
-				apiResponse
+				storedApiResponse
 			);
 		}
-	}, [apiResponse, redirectUrl, resetForm]);
+	}, []);
 
 	const handleManualRedirect = () => {
-		// Try all possible locations for the redirect URL
+		// Try all possible locations for the redirect URL, including session storage
 		const url =
 			redirectUrl ||
 			(apiResponse && apiResponse.redirect_url) ||
-			(apiResponse && apiResponse.data && apiResponse.data.redirect_url);
+			(apiResponse && apiResponse.data && apiResponse.data.redirect_url) ||
+			sessionStorage.getItem("redirectUrl");
 
 		if (url) {
 			window.location.href = url;
@@ -95,11 +120,18 @@ const SuccessPage = () => {
 	};
 
 	// Determine if we have a valid redirect URL from any source
-	const hasRedirectUrl = Boolean(
-		redirectUrl ||
-			(apiResponse && apiResponse.redirect_url) ||
-			(apiResponse && apiResponse.data && apiResponse.data.redirect_url)
-	);
+	const [hasRedirectUrl, setHasRedirectUrl] = useState(false);
+
+	// Check all possible sources for redirect URL
+	useEffect(() => {
+		const hasUrl = Boolean(
+			redirectUrl ||
+				(apiResponse && apiResponse.redirect_url) ||
+				(apiResponse && apiResponse.data && apiResponse.data.redirect_url) ||
+				sessionStorage.getItem("redirectUrl")
+		);
+		setHasRedirectUrl(hasUrl);
+	}, [redirectUrl, apiResponse]);
 
 	return (
 		<div className="relative">
@@ -140,7 +172,7 @@ const SuccessPage = () => {
 					transferred and recorded.
 				</p>
 
-				{hasRedirectUrl && isRedirecting && (
+				{isRedirecting ? (
 					<motion.div
 						className="mb-8 p-4 bg-gray-700 rounded-lg mx-auto max-w-md"
 						initial={{ opacity: 0, y: 20 }}
@@ -152,8 +184,23 @@ const SuccessPage = () => {
 							Redirecting to Pineapple in {countdown} seconds...
 						</p>
 						<div className="text-xs text-gray-400 truncate overflow-hidden">
-							{redirectUrl || (apiResponse && apiResponse.redirect_url) || ""}
+							{redirectUrl ||
+								(apiResponse && apiResponse.redirect_url) ||
+								sessionStorage.getItem("redirectUrl") ||
+								""}
 						</div>
+					</motion.div>
+				) : hasRedirectUrl ? null : (
+					<motion.div
+						className="mb-8 p-4 bg-gray-700/50 rounded-lg mx-auto max-w-md"
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ delay: 0.6 }}
+					>
+						<p className="text-yellow-300 mb-2 flex items-center justify-center">
+							<ExternalLink size={16} className="mr-2" />
+							No redirect URL was found
+						</p>
 					</motion.div>
 				)}
 
