@@ -1,0 +1,293 @@
+/* Browser Compatibility CSS 
+ * This file contains fallbacks and fixes for older browsers like Chrome on Windows 7
+ */
+
+/* CSS Variables Fallbacks */
+html {
+	/* CSS variables need to have -- prefix for proper variable definitions */
+	/* Teal colors */
+	--color-teal-300: #5eead4;
+	--color-teal-400: #2dd4bf;
+	--color-teal-500: #14b8a6;
+	--color-teal-600: #0d9488;
+	--color-teal-700: #0f766e;
+
+	/* Gray colors */
+	--color-gray-50: #f9fafb;
+	--color-gray-100: #f3f4f6;
+	--color-gray-200: #e5e7eb;
+	--color-gray-300: #d1d5db;
+	--color-gray-400: #9ca3af;
+	--color-gray-500: #6b7280;
+
+	/* Red colors */
+	--color-red-400: #f87171;
+	--color-red-500: #ef4444;
+
+	/* Background colors */
+	--background-dark: #0a0c10;
+	--background-input: #131620;
+
+	/* Border colors */
+	--border-color: #2a3142;
+	--border-hover: #3a4154;
+	--border-focus: #14b8a6; /* Using teal-500 */
+}
+
+/* Flexbox Fallbacks */
+.flex {
+	display: block;
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+}
+
+.items-center {
+	-webkit-box-align: center;
+	-moz-box-align: center;
+	-ms-flex-align: center;
+	-webkit-align-items: center;
+	align-items: center;
+}
+
+.justify-center {
+	-webkit-box-pack: center;
+	-moz-box-pack: center;
+	-ms-flex-pack: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+}
+
+.justify-between {
+	-webkit-box-pack: justify;
+	-moz-box-pack: justify;
+	-ms-flex-pack: justify;
+	-webkit-justify-content: space-between;
+	justify-content: space-between;
+}
+
+/* Shadow Fallbacks */
+.shadow-xl {
+	-webkit-box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+		0 10px 10px -5px rgba(0, 0, 0, 0.04);
+	-moz-box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+		0 10px 10px -5px rgba(0, 0, 0, 0.04);
+	box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+		0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Border Radius Fallbacks */
+.rounded-xl,
+.rounded-2xl,
+.rounded-full,
+input,
+select,
+textarea,
+.button {
+	-webkit-border-radius: 0.75rem;
+	-moz-border-radius: 0.75rem;
+	border-radius: 0.75rem;
+}
+
+.rounded-2xl {
+	-webkit-border-radius: 1rem;
+	-moz-border-radius: 1rem;
+	border-radius: 1rem;
+}
+
+.rounded-full {
+	-webkit-border-radius: 9999px;
+	-moz-border-radius: 9999px;
+	border-radius: 9999px;
+}
+
+/* Transform Fallbacks */
+.input-control:focus {
+	-webkit-transform: scale(1.01);
+	-moz-transform: scale(1.01);
+	-ms-transform: scale(1.01);
+	-o-transform: scale(1.01);
+	transform: scale(1.01);
+}
+
+/* Transition Fallbacks */
+.transition-colors,
+.button,
+input,
+a {
+	-webkit-transition: all 0.2s ease-in-out;
+	-moz-transition: all 0.2s ease-in-out;
+	-o-transition: all 0.2s ease-in-out;
+	transition: all 0.2s ease-in-out;
+}
+
+/* Linear Gradient Fallbacks */
+.button-secondary {
+	background: #131620; /* Fallback for browsers that don't support gradients */
+	background: -webkit-linear-gradient(left, #131620, #1c2130);
+	background: -moz-linear-gradient(left, #131620, #1c2130);
+	background: -o-linear-gradient(left, #131620, #1c2130);
+	background: linear-gradient(to right, #131620, #1c2130);
+}
+
+.button-secondary:hover {
+	background: #1c2130; /* Fallback for browsers that don't support gradients */
+	background: -webkit-linear-gradient(left, #1c2130, #252b3d);
+	background: -moz-linear-gradient(left, #1c2130, #252b3d);
+	background: -o-linear-gradient(left, #1c2130, #252b3d);
+	background: linear-gradient(to right, #1c2130, #252b3d);
+}
+
+/* Gradient Background Fallbacks */
+.gradient-blob-1 {
+	background: #0d9488; /* Fallback */
+	background: -webkit-linear-gradient(135deg, #0d9488 0%, #134e4a 100%);
+	background: -moz-linear-gradient(135deg, #0d9488 0%, #134e4a 100%);
+	background: -o-linear-gradient(135deg, #0d9488 0%, #134e4a 100%);
+	background: linear-gradient(135deg, #0d9488 0%, #134e4a 100%);
+}
+
+.gradient-blob-2 {
+	background: #0f172a; /* Fallback */
+	background: -webkit-linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+	background: -moz-linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+	background: -o-linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+	background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.gradient-blob-3 {
+	background: #115e59; /* Fallback */
+	background: -webkit-linear-gradient(135deg, #115e59 0%, #042f2e 100%);
+	background: -moz-linear-gradient(135deg, #115e59 0%, #042f2e 100%);
+	background: -o-linear-gradient(135deg, #115e59 0%, #042f2e 100%);
+	background: linear-gradient(135deg, #115e59 0%, #042f2e 100%);
+}
+
+.gradient-blob-4 {
+	background: #0f766e; /* Fallback */
+	background: -webkit-linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+	background: -moz-linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+	background: -o-linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+	background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+}
+
+/* Filter Fallbacks */
+.gradient-blob {
+	-webkit-filter: blur(140px);
+	-moz-filter: blur(140px);
+	-o-filter: blur(140px);
+	-ms-filter: blur(140px);
+	filter: blur(140px);
+}
+
+.gradient-blob-1 {
+	-webkit-filter: blur(180px);
+	-moz-filter: blur(180px);
+	-o-filter: blur(180px);
+	-ms-filter: blur(180px);
+	filter: blur(180px);
+}
+
+.gradient-blob-2 {
+	-webkit-filter: blur(160px);
+	-moz-filter: blur(160px);
+	-o-filter: blur(160px);
+	-ms-filter: blur(160px);
+	filter: blur(160px);
+}
+
+.gradient-blob-4 {
+	-webkit-filter: blur(100px);
+	-moz-filter: blur(100px);
+	-o-filter: blur(100px);
+	-ms-filter: blur(100px);
+	filter: blur(100px);
+}
+
+/* Box Shadow Fixes */
+input:focus,
+select:focus,
+textarea:focus,
+.button:focus,
+.input-control:focus {
+	-webkit-box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+	-moz-box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+	box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+}
+
+/* For IE and older browsers that don't support inset property */
+.inset-0 {
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+/* Alternative for browsers that don't support CSS variables */
+body {
+	background-color: #0a0c10; /* --background-dark */
+	color: #d1d5db; /* --color-gray-300 */
+}
+
+input,
+select,
+textarea {
+	background-color: #131620; /* --background-input */
+	border-color: #2a3142; /* --border-color */
+	color: #f9fafb; /* --color-gray-50 */
+}
+
+a {
+	color: #2dd4bf; /* --color-teal-400 */
+}
+
+a:hover {
+	color: #5eead4; /* --color-teal-300 */
+}
+
+.input-icon {
+	color: #6b7280; /* --color-gray-500 */
+}
+
+.input-icon-focused {
+	color: #2dd4bf; /* --color-teal-400 */
+}
+
+.input-valid-icon {
+	color: #2dd4bf; /* --color-teal-400 */
+}
+
+.input-error-icon,
+.input-error-message,
+.input-label-required {
+	color: #f87171; /* --color-red-400 */
+}
+
+input::placeholder,
+select::placeholder,
+textarea::placeholder {
+	color: #6b7280; /* --color-gray-500 */
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	color: #f9fafb; /* --color-gray-50 */
+}
+
+.input-label {
+	color: #d1d5db; /* --color-gray-300 */
+}
+
+/* Alternative for older browsers that don't support :focus-visible */
+.button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid #14b8a6;
+}

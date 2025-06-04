@@ -1,7 +1,48 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import "@styles/GradientBackground.css";
 
 export const GradientBackground = () => {
+	const [isOldBrowser, setIsOldBrowser] = useState(false);
+
+	// Check if we're in an older browser environment
+	useEffect(() => {
+		// Simple detection - in real implementation, use more robust checks
+		const isIE = !!document.documentMode; // Internet Explorer
+		const isOldChrome =
+			window.navigator.userAgent.indexOf("Chrome") > -1 &&
+			// Try to detect Chrome on Windows 7 or older Chrome versions
+			(window.navigator.userAgent.indexOf("Windows NT 6.1") > -1 ||
+				(window.navigator.userAgent.match(/Chrome\/(\d+)/) &&
+					parseInt(window.navigator.userAgent.match(/Chrome\/(\d+)/)[1]) < 50));
+
+		// Also detect if the browser supports filters
+		const supportsFilter = (() => {
+			try {
+				// Create a test element to check for filter support
+				const testEl = document.createElement("div");
+				testEl.style.cssText = "filter: blur(5px);";
+				return testEl.style.length > 0 && testEl.style.filter !== "";
+			} catch (e) {
+				return false;
+			}
+		})();
+
+		setIsOldBrowser(isIE || isOldChrome || !supportsFilter);
+	}, []);
+
+	// For older browsers, use the CSS-only version with fallbacks
+	if (isOldBrowser) {
+		return (
+			<div className="gradient-background">
+				<div className="gradient-blob gradient-blob-1"></div>
+				<div className="gradient-blob gradient-blob-2"></div>
+				<div className="gradient-blob gradient-blob-3"></div>
+				<div className="gradient-blob gradient-blob-4"></div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="absolute inset-0 overflow-hidden -z-10">
 			{/* Modern gradient background with teal accents */}

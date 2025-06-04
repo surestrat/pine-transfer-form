@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle, ArrowRight, RefreshCw, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Logo from "../components/ui/Logo";
-import { Button } from "../components/ui/Button";
-import { useFormStore } from "../store/formStore";
+import Logo from "@components/ui/Logo";
+import { Button } from "@components/ui/Button";
+import { useFormStore } from "@store/formStore";
+import "@styles/SuccessPage.css";
 
 const SuccessPage = () => {
 	const navigate = useNavigate();
@@ -134,9 +135,9 @@ const SuccessPage = () => {
 	}, [redirectUrl, apiResponse]);
 
 	return (
-		<div className="relative">
+		<div className="success-page">
 			<motion.div
-				className="mb-10 flex items-center justify-between"
+				className="header-container"
 				initial={{ y: -20, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ delay: 0.1, ease: "easeOut" }}
@@ -145,7 +146,7 @@ const SuccessPage = () => {
 			</motion.div>
 
 			<motion.div
-				className="bg-[#131620] rounded-2xl shadow-xl p-8 sm:p-12 text-center border border-[#2a3142]"
+				className="success-card"
 				initial={{ scale: 0.95, opacity: 0 }}
 				animate={{ scale: 1, opacity: 1 }}
 				transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 20 }}
@@ -159,31 +160,31 @@ const SuccessPage = () => {
 						stiffness: 300,
 						damping: 15,
 					}}
-					className="w-24 h-24 bg-gradient-to-br from-teal-500 to-teal-700 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl ring-4 ring-teal-500/20"
+					className="success-icon-wrapper"
 				>
-					<CheckCircle className="w-12 h-12 text-white" />
+					<CheckCircle className="success-icon" />
 				</motion.div>
 
-				<h1 className="text-3xl sm:text-4xl font-bold text-gray-100 mb-4">
-					<span className="text-teal-400">Submission</span> Received!
+				<h1 className="success-title">
+					<span className="success-title-accent">Submission</span> Received!
 				</h1>
-				<p className="text-gray-300 mb-5 max-w-md mx-auto text-lg leading-relaxed">
+				<p className="success-message">
 					Thank you! The customer's information has been successfully
 					transferred and recorded.
 				</p>
 
 				{isRedirecting ? (
 					<motion.div
-						className="mb-8 p-4 bg-[#1c2130] border border-teal-500/20 rounded-xl mx-auto max-w-md shadow-inner"
+						className="success-info"
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 0.6 }}
 					>
-						<p className="text-teal-400 mb-2 flex items-center justify-center font-medium">
-							<ExternalLink size={16} className="mr-2" />
+						<p className="success-info-heading">
+							<ExternalLink size={16} className="info-icon" />
 							Redirecting to Pineapple in {countdown} seconds...
 						</p>
-						<div className="text-xs text-gray-400 truncate overflow-hidden px-2 py-1 bg-[#131620] rounded-lg">
+						<div className="url-display">
 							{redirectUrl ||
 								(apiResponse && apiResponse.redirect_url) ||
 								sessionStorage.getItem("redirectUrl") ||
@@ -192,25 +193,25 @@ const SuccessPage = () => {
 					</motion.div>
 				) : hasRedirectUrl ? null : (
 					<motion.div
-						className="mb-8 p-4 bg-[#1c1c28] border border-yellow-500/20 rounded-xl mx-auto max-w-md shadow-inner"
+						className="warning-info"
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 0.6 }}
 					>
-						<p className="text-yellow-300 mb-2 flex items-center justify-center">
-							<ExternalLink size={16} className="mr-2" />
+						<p className="warning-heading">
+							<ExternalLink size={16} className="info-icon" />
 							No redirect URL was found
 						</p>
 					</motion.div>
 				)}
 
-				<div className="flex flex-col sm:flex-row gap-4 justify-center">
+				<div className="action-container">
 					<Button
 						onClick={() => navigate("/")}
 						variant="primary"
-						className="mx-auto"
+						className="action-button"
 					>
-						<RefreshCw size={18} className="mr-2" />
+						<RefreshCw size={18} className="button-icon" />
 						Submit Another Transfer
 					</Button>
 
@@ -218,9 +219,9 @@ const SuccessPage = () => {
 						<Button
 							onClick={handleManualRedirect}
 							variant="outline"
-							className="mx-auto"
+							className="action-button"
 						>
-							<ExternalLink size={18} className="mr-2" />
+							<ExternalLink size={18} className="button-icon" />
 							Go to Pineapple Now
 						</Button>
 					)}

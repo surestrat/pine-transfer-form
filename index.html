@@ -2,6 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<link rel="icon" type="image/svg+xml" href="/surestrat-icon.svg" />
 		<!-- Suggest adding a custom icon -->
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,9 +11,39 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<!-- Link to Inter font included in index.css, but preconnect helps performance -->
+
+		<!-- Browser detector - must be first script to apply fixes early -->
+		<script src="./src/utils/browser-detector.js"></script>
+
+		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+		<!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+			<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+		<!-- Polyfills for older browsers -->
+		<script src="https://cdn.jsdelivr.net/npm/css-vars-ponyfill@2"></script>
+		<script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/whatwg-fetch@3.6.2/dist/fetch.umd.min.js"></script>
 	</head>
 	<body>
 		<div id="root"></div>
 		<script type="module" src="/src/main.jsx"></script>
+		<!-- IE polyfills script - will only run in older browsers -->
+		<script src="./src/utils/ie-polyfills.js"></script>
+		<!-- Run CSS vars polyfill -->
+		<script>
+			// Initialize CSS variables polyfill for older browsers
+			if (typeof cssVars === "function") {
+				cssVars({
+					// Options
+					rootElement: document,
+					shadowDOM: false,
+					include: 'style,link[rel="stylesheet"]',
+					onlyLegacy: true,
+					silent: true,
+				});
+			}
+		</script>
 	</body>
 </html>

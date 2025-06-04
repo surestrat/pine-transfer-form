@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Browser Compatibility Test</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				max-width: 800px;
+				margin: 20px auto;
+				padding: 0 20px;
+				line-height: 1.6;
+			}
+			.test-section {
+				border: 1px solid #ddd;
+				padding: 15px;
+				margin-bottom: 20px;
+				border-radius: 5px;
+			}
+			.test-failed {
+				background-color: #ffe6e6;
+			}
+			.test-passed {
+				background-color: #e6ffe6;
+			}
+			h2 {
+				margin-top: 0;
+			}
+			button {
+				padding: 8px 15px;
+				margin-right: 10px;
+			}
+			#results {
+				white-space: pre-wrap;
+				background-color: #f5f5f5;
+				padding: 10px;
+				border-radius: 5px;
+				font-family: monospace;
+				max-height: 300px;
+				overflow: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Browser Compatibility Test</h1>
+		<p>
+			This page tests various features to ensure they are working correctly in
+			your browser.
+		</p>
+
+		<div class="test-section">
+			<h2>Browser Information</h2>
+			<div id="browser-info"></div>
+		</div>
+
+		<div class="test-section">
+			<h2>CSS Variables Test</h2>
+			<div>
+				This element should be
+				<span id="css-var-test" style="color: var(--color-teal-500, black)"
+					>teal colored</span
+				>.
+			</div>
+			<div id="css-var-result"></div>
+		</div>
+
+		<div class="test-section">
+			<h2>Flexbox Test</h2>
+			<div
+				id="flex-test"
+				style="
+					display: flex;
+					justify-content: space-between;
+					background: #eee;
+					padding: 10px;
+				"
+			>
+				<div>Item 1</div>
+				<div>Item 2</div>
+				<div>Item 3</div>
+			</div>
+			<div id="flex-result"></div>
+		</div>
+
+		<div class="test-section">
+			<h2>Gradients Test</h2>
+			<div
+				id="gradient-test"
+				style="
+					height: 50px;
+					width: 100%;
+					background: linear-gradient(to right, #0d9488, #134e4a);
+				"
+			></div>
+			<div id="gradient-result"></div>
+		</div>
+
+		<div class="test-section">
+			<h2>Box Shadow Test</h2>
+			<div
+				id="shadow-test"
+				style="
+					height: 50px;
+					width: 100%;
+					background: white;
+					box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+				"
+			></div>
+			<div id="shadow-result"></div>
+		</div>
+
+		<div class="test-section">
+			<h2>Filter Test</h2>
+			<div
+				id="filter-test"
+				style="height: 50px; width: 100%; background: blue; filter: blur(5px)"
+			></div>
+			<div id="filter-result"></div>
+		</div>
+
+		<div class="test-section">
+			<h2>Run All Tests</h2>
+			<button id="run-tests">Run Tests</button>
+			<div id="results"></div>
+		</div>
+
+		<script>
+			// Wait for DOM to be ready
+			document.addEventListener("DOMContentLoaded", function () {
+				// Display browser info
+				var browserInfoEl = document.getElementById("browser-info");
+				var userAgent = navigator.userAgent;
+				browserInfoEl.innerHTML =
+					"<strong>User Agent:</strong> " + userAgent + "<br>";
+
+				// Detect IE
+				var isIE = /*@cc_on!@*/ false || !!document.documentMode;
+				browserInfoEl.innerHTML +=
+					"<strong>Internet Explorer:</strong> " +
+					(isIE ? "Yes" : "No") +
+					"<br>";
+
+				// Try to detect Chrome version
+				var chromeMatch = userAgent.match(/Chrome\/(\d+)/);
+				var chromeVersion = chromeMatch ? chromeMatch[1] : "N/A";
+				browserInfoEl.innerHTML +=
+					"<strong>Chrome Version:</strong> " + chromeVersion + "<br>";
+
+				// Detect Windows version
+				var isWindows7 = userAgent.indexOf("Windows NT 6.1") !== -1;
+				browserInfoEl.innerHTML +=
+					"<strong>Windows 7:</strong> " + (isWindows7 ? "Yes" : "No") + "<br>";
+
+				// Run tests button
+				document
+					.getElementById("run-tests")
+					.addEventListener("click", runAllTests);
+
+				// Initial test run
+				setTimeout(runAllTests, 500);
+			});
+
+			function runAllTests() {
+				var results = document.getElementById("results");
+				results.innerHTML = "";
+
+				// Test CSS Variables
+				testCssVars();
+
+				// Test Flexbox
+				testFlexbox();
+
+				// Test Gradients
+				testGradients();
+
+				// Test Box Shadow
+				testBoxShadow();
+
+				// Test Filter
+				testFilter();
+
+				results.innerHTML += "\nTests completed!";
+			}
+
+			function testCssVars() {
+				var element = document.getElementById("css-var-test");
+				var computedStyle = getComputedStyle(element);
+				var color = computedStyle.color;
+				var result = document.getElementById("css-var-result");
+
+				var logMsg = "CSS Variables Test: ";
+
+				// Check if the color is close to teal
+				if (isTealish(color)) {
+					result.innerHTML = "✅ CSS variables are working correctly!";
+					result.parentElement.classList.add("test-passed");
+					result.parentElement.classList.remove("test-failed");
+					logMsg += "PASSED - Color appears to be teal";
+				} else {
+					result.innerHTML =
+						"❌ CSS variables are not working. Fallbacks should be used.";
+					result.parentElement.classList.add("test-failed");
+					result.parentElement.classList.remove("test-passed");
+					logMsg += "FAILED - Color is not teal, got: " + color;
+				}
+
+				var results = document.getElementById("results");
+				results.innerHTML += logMsg + "\n";
+			}
+
+			function testFlexbox() {
+				var element = document.getElementById("flex-test");
+				var computedStyle = getComputedStyle(element);
+				var display = computedStyle.display;
+				var result = document.getElementById("flex-result");
+
+				var logMsg = "Flexbox Test: ";
+
+				// Check if flexbox is supported
+				if (display.indexOf("flex") !== -1) {
+					result.innerHTML = "✅ Flexbox is working!";
+					result.parentElement.classList.add("test-passed");
+					result.parentElement.classList.remove("test-failed");
+					logMsg += "PASSED - Display is: " + display;
+				} else {
+					result.innerHTML =
+						"❌ Flexbox is not supported. Fallbacks should be used.";
+					result.parentElement.classList.add("test-failed");
+					result.parentElement.classList.remove("test-passed");
+					logMsg += "FAILED - Display is: " + display;
+				}
+
+				var results = document.getElementById("results");
+				results.innerHTML += logMsg + "\n";
+			}
+
+			function testGradients() {
+				var element = document.getElementById("gradient-test");
+				var computedStyle = getComputedStyle(element);
+				var background = computedStyle.backgroundImage;
+				var result = document.getElementById("gradient-result");
+
+				var logMsg = "Gradients Test: ";
+
+				// Check if gradient is supported
+				if (background.indexOf("gradient") !== -1) {
+					result.innerHTML = "✅ Gradients are working!";
+					result.parentElement.classList.add("test-passed");
+					result.parentElement.classList.remove("test-failed");
+					logMsg += "PASSED - Background contains gradient: " + background;
+				} else {
+					result.innerHTML =
+						"❌ Gradients are not supported. Fallbacks should be used.";
+					result.parentElement.classList.add("test-failed");
+					result.parentElement.classList.remove("test-passed");
+					logMsg +=
+						"FAILED - Background does not contain gradient: " + background;
+				}
+
+				var results = document.getElementById("results");
+				results.innerHTML += logMsg + "\n";
+			}
+
+			function testBoxShadow() {
+				var element = document.getElementById("shadow-test");
+				var computedStyle = getComputedStyle(element);
+				var boxShadow = computedStyle.boxShadow;
+				var result = document.getElementById("shadow-result");
+
+				var logMsg = "Box Shadow Test: ";
+
+				// Check if box-shadow is supported
+				if (boxShadow && boxShadow !== "none") {
+					result.innerHTML = "✅ Box shadow is working!";
+					result.parentElement.classList.add("test-passed");
+					result.parentElement.classList.remove("test-failed");
+					logMsg += "PASSED - Box shadow is: " + boxShadow;
+				} else {
+					result.innerHTML =
+						"❌ Box shadow is not supported. Fallbacks should be used.";
+					result.parentElement.classList.add("test-failed");
+					result.parentElement.classList.remove("test-passed");
+					logMsg += "FAILED - Box shadow is not supported";
+				}
+
+				var results = document.getElementById("results");
+				results.innerHTML += logMsg + "\n";
+			}
+
+			function testFilter() {
+				var element = document.getElementById("filter-test");
+				var computedStyle = getComputedStyle(element);
+				var filter = computedStyle.filter || computedStyle.webkitFilter;
+				var result = document.getElementById("filter-result");
+
+				var logMsg = "Filter Test: ";
+
+				// Check if filter is supported
+				if (filter && filter !== "none") {
+					result.innerHTML = "✅ CSS filters are working!";
+					result.parentElement.classList.add("test-passed");
+					result.parentElement.classList.remove("test-failed");
+					logMsg += "PASSED - Filter is: " + filter;
+				} else {
+					result.innerHTML =
+						"❌ CSS filters are not supported. Fallbacks should be used.";
+					result.parentElement.classList.add("test-failed");
+					result.parentElement.classList.remove("test-passed");
+					logMsg += "FAILED - Filters are not supported";
+				}
+
+				var results = document.getElementById("results");
+				results.innerHTML += logMsg + "\n";
+			}
+
+			function isTealish(color) {
+				// Parse the color into RGB components
+				var rgb = parseRgb(color);
+				if (!rgb) return false;
+
+				// Check if the color is in the teal range (more green/blue than red)
+				return rgb.g > rgb.r && rgb.b > rgb.r;
+			}
+
+			function parseRgb(color) {
+				// Handle rgb/rgba format
+				var match = color.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+				if (match) {
+					return {
+						r: parseInt(match[1], 10),
+						g: parseInt(match[2], 10),
+						b: parseInt(match[3], 10),
+					};
+				}
+
+				// Handle hex format
+				match = color.match(/#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i);
+				if (match) {
+					return {
+						r: parseInt(match[1], 16),
+						g: parseInt(match[2], 16),
+						b: parseInt(match[3], 16),
+					};
+				}
+
+				return null;
+			}
+		</script>
+	</body>
+</html>

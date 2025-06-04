@@ -1,0 +1,134 @@
+.gradient-background {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	z-index: -10;
+}
+
+.gradient-blob {
+	position: absolute;
+	border-radius: 50%;
+	filter: blur(140px);
+}
+
+.gradient-blob-1 {
+	top: -10%;
+	right: -10%;
+	width: 60%;
+	height: 60%;
+	opacity: 0.2;
+	filter: blur(180px);
+	background: linear-gradient(135deg, #0d9488 0%, #134e4a 100%);
+}
+
+.gradient-blob-2 {
+	bottom: -15%;
+	left: -10%;
+	width: 55%;
+	height: 55%;
+	opacity: 0.2;
+	filter: blur(160px);
+	background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.gradient-blob-3 {
+	top: 30%;
+	left: 25%;
+	width: 40%;
+	height: 40%;
+	opacity: 0.15;
+	filter: blur(140px);
+	background: linear-gradient(135deg, #115e59 0%, #042f2e 100%);
+}
+
+.gradient-blob-4 {
+	top: 60%;
+	right: 20%;
+	width: 25%;
+	height: 25%;
+	opacity: 0.1;
+	filter: blur(100px);
+	background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+}
+
+/* Fallback for browsers that don't support filters or gradients */
+@supports not (filter: blur(140px)) {
+	.gradient-background {
+		background-color: #0a0c10;
+	}
+
+	.gradient-blob {
+		display: none;
+	}
+}
+
+/* Additional browser compatibility fixes */
+.gradient-background {
+	position: absolute;
+	/* IE8 and below don't support inset */
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	/* For IE7 */
+	*width: 100%;
+	*height: 100%;
+	overflow: hidden;
+}
+
+/* Gradient & filter prefixes for each blob */
+.gradient-blob-1 {
+	/* Fallback solid color */
+	background-color: #0d9488;
+	/* Vendor prefixes for gradient */
+	background: -webkit-linear-gradient(135deg, #0d9488 0%, #134e4a 100%);
+	background: -moz-linear-gradient(135deg, #0d9488 0%, #134e4a 100%);
+	background: -o-linear-gradient(135deg, #0d9488 0%, #134e4a 100%);
+	/* Vendor prefixes for filter */
+	-webkit-filter: blur(180px);
+	-moz-filter: blur(180px);
+	-ms-filter: blur(180px);
+	filter: progid:DXImageTransform.Microsoft.Blur(pixelRadius=180); /* IE filter */
+}
+
+.gradient-blob-2 {
+	/* Fallback solid color */
+	background-color: #0f172a;
+	/* Vendor prefixes for gradient */
+	background: -webkit-linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+	background: -moz-linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+	background: -o-linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+	/* Vendor prefixes for filter */
+	-webkit-filter: blur(160px);
+	-moz-filter: blur(160px);
+	-ms-filter: blur(160px);
+	filter: progid:DXImageTransform.Microsoft.Blur(pixelRadius=160); /* IE filter */
+}
+
+.gradient-blob-3 {
+	/* Fallback solid color */
+	background-color: #115e59;
+	/* Vendor prefixes for gradient */
+	background: -webkit-linear-gradient(135deg, #115e59 0%, #042f2e 100%);
+	background: -moz-linear-gradient(135deg, #115e59 0%, #042f2e 100%);
+	background: -o-linear-gradient(135deg, #115e59 0%, #042f2e 100%);
+	/* Vendor prefixes for filter */
+	-webkit-filter: blur(140px);
+	-moz-filter: blur(140px);
+	-ms-filter: blur(140px);
+	filter: progid:DXImageTransform.Microsoft.Blur(pixelRadius=140); /* IE filter */
+}
+
+.gradient-blob-4 {
+	/* Fallback solid color */
+	background-color: #0f766e;
+	/* Vendor prefixes for gradient */
+	background: -webkit-linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+	background: -moz-linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+	background: -o-linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+	/* Vendor prefixes for filter */
+	-webkit-filter: blur(100px);
+	-moz-filter: blur(100px);
+	-ms-filter: blur(100px);
+	filter: progid:DXImageTransform.Microsoft.Blur(pixelRadius=100); /* IE filter */
+}

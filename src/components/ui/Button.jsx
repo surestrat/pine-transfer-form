@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import "@styles/Button.css"; // Import the CSS file
 
 export const Button = ({
 	children,
@@ -9,32 +10,53 @@ export const Button = ({
 	disabled = false,
 	className = "",
 }) => {
-	const baseStyles =
-		"inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-medium text-base tracking-tight transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 shadow-medium hover:shadow-lg"; // Added dark ring offset
+	const [isOldBrowser, setIsOldBrowser] = useState(false);
 
-	const variantStyles = {
-		primary:
-			"bg-teal-600 hover:bg-teal-500 text-white focus:ring-teal-400 border border-teal-500/30", // Teal primary button
-		secondary:
-			"bg-gradient-to-r from-[#131620] to-[#1c2130] hover:from-[#1c2130] hover:to-[#252b3d] text-white border border-[#2a3142] focus:ring-[#2a3142]", // Modern dark gradient
-		outline:
-			"border border-teal-500/50 bg-transparent hover:bg-teal-500/10 text-teal-300 focus:ring-teal-400/30 shadow-soft hover:shadow-medium", // Teal outline
-	};
+	// Check if we're in an older browser environment
+	useEffect(() => {
+		// Simple detection - in real implementation, use more robust checks
+		const isIE = !!document.documentMode; // Internet Explorer
+		const isOldChrome =
+			window.navigator.userAgent.indexOf("Chrome") > -1 &&
+			// Try to detect Chrome on Windows 7 or older Chrome versions
+			(window.navigator.userAgent.indexOf("Windows NT 6.1") > -1 ||
+				(window.navigator.userAgent.match(/Chrome\/(\d+)/) &&
+					parseInt(window.navigator.userAgent.match(/Chrome\/(\d+)/)[1]) < 50));
 
-	const disabledStyles =
-		"opacity-50 cursor-not-allowed shadow-none hover:shadow-none";
+		setIsOldBrowser(isIE || isOldChrome);
+	}, []);
 
+	// Build class names based on props
+	const buttonClasses = [
+		"button",
+		`button-${variant}`,
+		disabled ? "button-disabled" : "",
+		className,
+	]
+		.filter(Boolean)
+		.join(" ");
+
+	// For older browsers, render a regular button without animations
+	if (isOldBrowser) {
+		return (
+			<button
+				type={type}
+				onClick={onClick}
+				disabled={disabled}
+				className={buttonClasses}
+			>
+				{children}
+			</button>
+		);
+	}
+
+	// For modern browsers, use motion animations
 	return (
 		<motion.button
 			type={type}
 			onClick={onClick}
 			disabled={disabled}
-			className={`
-        ${baseStyles}
-        ${variantStyles[variant]}
-        ${disabled ? disabledStyles : ""}
-        ${className}
-      `}
+			className={buttonClasses}
 			whileHover={disabled ? {} : { scale: 1.03, y: -1 }} // Subtle lift on hover
 			whileTap={disabled ? {} : { scale: 0.98 }}
 			transition={{ type: "spring", stiffness: 400, damping: 15 }} // Spring animation

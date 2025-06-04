@@ -14,6 +14,7 @@ import { useFormStore } from "@store/formStore";
 import { InputField } from "@components/ui/InputField";
 import { Button } from "@components/ui/Button";
 import { submitForm } from "@services/apiService";
+import "@styles/LeadForm.css";
 
 const branchOptions = [
 	{ value: "", label: "Select Office..." },
@@ -118,16 +119,15 @@ const LeadForm = () => {
 			setIsSubmitting(false);
 		}
 	};
-
 	return (
-		<form onSubmit={handleSubmit} className="space-y-5">
-			<h2 className="text-xl font-semibold text-gray-100 border-b border-[#2a3142] pb-2 mb-6 flex items-center">
-				<span className="bg-teal-500/10 text-teal-400 p-1.5 rounded-lg mr-2">
+		<form onSubmit={handleSubmit} className="lead-form">
+			<h2 className="section-title">
+				<span className="section-icon">
 					<User size={18} />
 				</span>
 				Customer Details
 			</h2>
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
+			<div className="form-grid">
 				<motion.div
 					initial={{ x: -10, opacity: 0 }}
 					animate={{ x: 0, opacity: 1 }}
@@ -204,16 +204,15 @@ const LeadForm = () => {
 					required
 					icon={Phone}
 				/>
-			</motion.div>
-			<div className="pt-8 mt-8 border-t border-gray-700">
-				{/* Darker top border */}
-				<h2 className="text-xl font-semibold text-gray-100 border-b border-[#2a3142] pb-2 mb-6 flex items-center">
-					<span className="bg-teal-500/10 text-teal-400 p-1.5 rounded-lg mr-2">
+			</motion.div>{" "}
+			<div className="divider-section">
+				<h2 className="section-title">
+					<span className="section-icon">
 						<FileText size={18} />
 					</span>
 					Agent Information
 				</h2>
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
+				<div className="form-grid">
 					<InputField
 						label="Agent Name"
 						name="agent_name"
@@ -222,33 +221,19 @@ const LeadForm = () => {
 						error={errors.agent_name}
 						required
 						icon={User}
-					/>
-					<div className="mb-5">
-						<label
-							htmlFor="branch_name"
-							className="block text-sm font-medium text-gray-300 mb-1.5"
-						>
-							Office <span className="text-red-400">*</span>
+					/>{" "}
+					<div className="form-group">
+						<label htmlFor="branch_name" className="form-label">
+							Office <span className="required-mark">*</span>
 						</label>
-						<div className="relative">
+						<div className="select-wrapper">
 							<select
 								id="branch_name"
 								name="branch_name"
 								value={agent_info.branch_name}
 								onChange={handleAgentChange}
 								required
-								className={`
-										w-full pr-6 pl-4 py-3 rounded-xl border shadow-inner
-										bg-[#131620] focus:bg-[#1c2130]
-										focus:outline-none focus:ring-2 focus:ring-opacity-75
-										text-gray-100 placeholder-gray-500
-										${
-											errors.branch_name
-												? "border-red-500/70 ring-red-500/20"
-												: "border-[#2a3142] hover:border-[#3a4154] focus:border-teal-500 focus:ring-teal-500/20"
-										}
-										disabled:bg-[#0f1219] disabled:cursor-not-allowed disabled:border-[#20253a] disabled:opacity-60
-									`}
+								className={`form-select ${errors.branch_name ? "error" : ""}`}
 								aria-invalid={!!errors.branch_name}
 								aria-describedby={
 									errors.branch_name ? "branch-error" : undefined
@@ -260,57 +245,49 @@ const LeadForm = () => {
 									</option>
 								))}
 							</select>
-						</div>
+						</div>{" "}
 						{errors.branch_name && (
-							<p
-								id="branch-error"
-								className="mt-1.5 text-xs text-red-400"
-								role="alert"
-							>
+							<p id="branch-error" className="error-message" role="alert">
 								{errors.branch_name}
 							</p>
 						)}
 					</div>
 				</div>
 			</div>
-			{/* ... Error Message Display (Adjust colors if needed) ... */}
+			{/* ... Error Message Display (Adjust colors if needed) ... */}{" "}
 			<AnimatePresence>
 				{error && (
 					<motion.div
 						initial={{ opacity: 0, y: -10 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0 }}
-						className="bg-red-900/20 border border-red-500/30 p-4 rounded-xl mt-6 shadow-inner"
+						className="alert-box"
 						role="alert"
 					>
-						<div className="flex items-start">
-							<AlertCircle
-								className="text-red-400 mr-3 flex-shrink-0 mt-0.5" // Lighter red icon
-								size={20}
-							/>
-							<p className="text-sm text-red-300">{error}</p>{" "}
-							{/* Lighter red text */}
+						<div className="alert-content">
+							<AlertCircle className="alert-icon" size={20} />
+							<p className="alert-message">{error}</p>
 						</div>
 					</motion.div>
 				)}
 			</AnimatePresence>
-			{/* ... Submission Button ... */}
-			<div className="flex justify-end pt-6">
+			{/* ... Submission Button ... */}{" "}
+			<div className="form-footer">
 				<Button
 					type="submit"
 					variant="primary"
 					disabled={isSubmitting}
-					className="w-full sm:w-auto min-w-[180px]"
+					className="submit-button"
 				>
 					{isSubmitting ? (
 						<>
-							<Loader2 className="mr-2 h-5 w-5 animate-spin" />
+							<Loader2 className="loading-icon" />
 							Submitting...
 						</>
 					) : (
 						<>
 							Submit Application
-							<Check className="ml-2 h-5 w-5" />
+							<Check className="check-icon" />
 						</>
 					)}
 				</Button>

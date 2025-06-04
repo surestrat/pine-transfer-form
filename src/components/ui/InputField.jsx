@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, Check } from "lucide-react";
+import "@styles/InputField.css";
 
 export const InputField = ({
 	label,
@@ -12,10 +13,25 @@ export const InputField = ({
 	required = false,
 	pattern,
 	placeholder,
-	icon: Icon, // Add icon prop
+	icon: Icon,
 }) => {
 	const [focused, setFocused] = useState(false);
 	const [touched, setTouched] = useState(false);
+	const [isOldBrowser, setIsOldBrowser] = useState(false);
+
+	// Check if we're in an older browser environment
+	useEffect(() => {
+		// Simple detection - in real implementation, use more robust checks
+		const isIE = !!document.documentMode; // Internet Explorer
+		const isOldChrome =
+			window.navigator.userAgent.indexOf("Chrome") > -1 &&
+			// Try to detect Chrome on Windows 7 or older Chrome versions
+			(window.navigator.userAgent.indexOf("Windows NT 6.1") > -1 ||
+				(window.navigator.userAgent.match(/Chrome\/(\d+)/) &&
+					parseInt(window.navigator.userAgent.match(/Chrome\/(\d+)/)[1]) < 50));
+
+		setIsOldBrowser(isIE || isOldChrome);
+	}, []);
 
 	const isValid = touched && value && !error;
 
@@ -29,86 +45,97 @@ export const InputField = ({
 
 	const hasIcon = !!Icon;
 
+	// Build className strings
+	const inputClassName = [
+		"input-control",
+		hasIcon ? "input-with-icon" : "",
+		focused ? "input-focused" : "",
+		error && touched ? "input-error" : "",
+		isValid ? "input-valid" : "",
+	]
+		.filter(Boolean)
+		.join(" ");
+
+	const iconClassName = ["input-icon", focused ? "input-icon-focused" : ""]
+		.filter(Boolean)
+		.join(" ");
+
 	return (
-		<div className="relative mb-5">
-			<label
-				htmlFor={name}
-				className="block text-sm font-medium text-gray-300 mb-1.5" // Lighter label text
-			>
-				{label} {required && <span className="text-red-400">*</span>}{" "}
-				{/* Lighter required star */}
+		<div className="input-field-container">
+			<label htmlFor={name} className="input-label">
+				{label} {required && <span className="input-label-required">*</span>}
 			</label>
-			<div className="relative">
+			<div className="input-wrapper">
 				{/* Icon positioned absolutely on the left */}
 				{hasIcon && (
-					<div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-						<Icon
-							className={`h-5 w-5 ${
-								focused ? "text-primary-400" : "text-gray-500" // Lighter primary focus, darker gray default
-							}`}
-						/>
+					<div className="input-icon-left">
+						<Icon className={iconClassName} />
 					</div>
+				)}{" "}
+				{isOldBrowser ? (
+					// Regular input for older browsers
+					<input
+						id={name}
+						name={name}
+						type={type}
+						value={value}
+						onChange={onChange}
+						onFocus={() => setFocused(true)}
+						onBlur={handleBlur}
+						required={required}
+						pattern={pattern}
+						placeholder={placeholder || `Enter ${label.toLowerCase()}...`}
+						aria-invalid={!!error}
+						aria-describedby={error ? `${name}-error` : undefined}
+						className={inputClassName}
+					/>
+				) : (
+					// Motion input for modern browsers
+					<motion.input
+						id={name}
+						name={name}
+						type={type}
+						value={value}
+						onChange={onChange}
+						onFocus={() => setFocused(true)}
+						onBlur={handleBlur}
+						required={required}
+						pattern={pattern}
+						placeholder={placeholder || `Enter ${label.toLowerCase()}...`}
+						aria-invalid={!!error}
+						aria-describedby={error ? `${name}-error` : undefined}
+						className={inputClassName}
+						whileFocus={{ scale: 1.01 }}
+					/>
 				)}
-				<motion.input
-					id={name}
-					name={name}
-					type={type}
-					value={value}
-					onChange={onChange}
-					onFocus={() => setFocused(true)}
-					onBlur={handleBlur}
-					required={required}
-					pattern={pattern}
-					placeholder={placeholder || `Enter ${label.toLowerCase()}...`}
-					aria-invalid={!!error}
-					aria-describedby={error ? `${name}-error` : undefined}
-					className={`
-            w-full ${hasIcon ? "pl-11" : "pl-4"} pr-10 py-3 rounded-xl border
-            transition-all duration-200 ease-in-out
-            bg-[#131620] focus:bg-[#1c2130] /* Modern darker input background */
-            focus:outline-none focus:ring-2 focus:ring-opacity-75 shadow-inner
-            text-gray-100 placeholder-gray-500 /* Light text, muted placeholder */
-            ${
-							focused
-								? "border-teal-500 ring-teal-500/20" // Modern teal focus ring
-								: "border-[#2a3142] hover:border-[#3a4154]" // More distinct border colors
-						}
-            ${
-							error
-								? "border-red-500/70 ring-red-500/20" // Slightly muted error colors for better dark theme harmony
-								: ""
-						}
-            ${
-							isValid
-								? "border-teal-600/70 ring-teal-500/20" // Use teal instead of green for consistency
-								: ""
-						}
-            disabled:bg-[#0f1219] disabled:cursor-not-allowed disabled:border-[#20253a] disabled:opacity-60 /* Even darker disabled state */
-          `}
-					whileFocus={{ scale: 1.01 }}
-				/>
-
 				{/* Validation Icons positioned absolutely on the right */}
-				<div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-					{/* Use teal for valid state */}
-					{isValid && <Check className="h-5 w-5 text-teal-400" />}
-					{error && <AlertCircle className="h-5 w-5 text-red-400" />}
+				<div className="input-validation-icon">
+					{isValid && <Check className="input-valid-icon" />}
+					{error && touched && <AlertCircle className="input-error-icon" />}
 				</div>
 			</div>
-			<AnimatePresence>
-				{error && touched && (
-					<motion.p
-						id={`${name}-error`}
-						initial={{ opacity: 0, y: -5 }}
-						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: -5 }}
-						className="mt-1.5 text-xs text-red-400" // Lighter error text
-						role="alert"
-					>
+
+			{/* Error message - conditional rendering based on browser */}
+			{error &&
+				touched &&
+				(isOldBrowser ? (
+					<p id={`${name}-error`} className="input-error-message" role="alert">
 						{error}
-					</motion.p>
-				)}
-			</AnimatePresence>
+					</p>
+				) : (
+					<AnimatePresence>
+						<motion.p
+							id={`${name}-error`}
+							initial={{ opacity: 0, y: -5 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -5 }}
+							className="input-error-message"
+							role="alert"
+						>
+							{error}
+						</motion.p>
+					</AnimatePresence>
+				))}
 		</div>
 	);
 };

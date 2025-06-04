@@ -1,13 +1,43 @@
-# React + Vite
+# SureStrat Pine Transfer Form
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern form application with full backward compatibility for older browsers.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Modern UI with Framer Motion animations for new browsers
+- Fallbacks and compatibility for older browsers (including IE11 and Chrome on Windows 7)
+- CSS Variables with fallbacks
+- Progressive enhancement based on browser capabilities
+- Full form validation
 
-## Expanding the ESLint configuration
+## Browser Compatibility
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-# pine-transfer-form
+This application has been specifically optimized for:
+
+- Modern browsers (Chrome, Firefox, Safari, Edge)
+- Internet Explorer 11
+- Older Chrome versions (specifically for Windows 7)
+
+For more details about the browser compatibility implementations, see [BROWSER_COMPATIBILITY.md](./BROWSER_COMPATIBILITY.md).
+
+## Testing Browser Compatibility
+
+To test browser compatibility:
+
+1. Start the development server:
+
+   ```
+   npm run dev
+   ```
+
+2. Open the browser compatibility test page at:
+
+   ```
+   http://localhost:5173/browser-test.html
+   ```
+
+3. The test page will show which features are supported in your current browser and if fallbacks are being applied correctly.
+
+## Development
+
+This project uses React with Vite for development. The standard Vite commands apply:
