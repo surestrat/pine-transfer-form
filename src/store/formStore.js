@@ -4,11 +4,11 @@ import { z } from "zod";
 const formSchema = z.object({
 	first_name: z.string().min(2, "First name must be at least 2 characters"),
 	last_name: z.string().min(2, "Last name must be at least 2 characters"),
-	email: z.string().email("Invalid email address"),
+	email: z.string().email("Invalid email address").or(z.literal("")),
 	id_number: z
 		.string()
 		.min(13, "ID number must be at least 13 characters")
-		.optional(), // Make optional as per API docs
+		.or(z.literal("")), // Allow empty string
 	quote_id: z.string().optional(), // Make optional as per API docs
 	contact_number: z
 		.string()
@@ -47,13 +47,19 @@ export const useFormStore = create((set, get) => ({
 
 			const updatedErrors = { ...state.errors };
 
-			try {
-				formSchema.shape[field].parse(value);
-
+			// Special handling for optional fields with empty values
+			if ((field === "email" || field === "id_number") && value === "") {
+				// Empty value is valid for these optional fields
 				delete updatedErrors[field];
-			} catch (error) {
-				if (error instanceof z.ZodError) {
-					updatedErrors[field] = error.errors[0]?.message || `Invalid ${field}`;
+			} else {
+				try {
+					formSchema.shape[field].parse(value);
+					delete updatedErrors[field];
+				} catch (error) {
+					if (error instanceof z.ZodError) {
+						updatedErrors[field] =
+							error.errors[0]?.message || `Invalid ${field}`;
+					}
 				}
 			}
 
@@ -81,7 +87,7 @@ export const useFormStore = create((set, get) => ({
 			}
 
 			return {
-					agent_info: updatedAgentInfo,
+				agent_info: updatedAgentInfo,
 				errors: updatedErrors,
 			};
 		});
@@ -92,17 +98,34 @@ export const useFormStore = create((set, get) => ({
 		const updatedErrors = {};
 		let isValid = true;
 
+		// Create a sanitized copy with empty strings for optional fields if needed
+		const sanitizedCustomerInfo = {
+			...customer_info,
+			// Ensure empty strings for optional fields
+			email: customer_info.email || "",
+			id_number: customer_info.id_number || "",
+			quote_id: customer_info.quote_id || "",
+		};
+
 		try {
-			formSchema.parse(customer_info);
+			formSchema.parse(sanitizedCustomerInfo);
 		} catch (error) {
 			if (error instanceof z.ZodError) {
 				error.errors.forEach((err) => {
 					const path = err.path[0];
 					if (path !== undefined) {
+						// Skip validation errors for empty optional fields
+						if (
+							(path === "email" || path === "id_number") &&
+							(!sanitizedCustomerInfo[path] ||
+								sanitizedCustomerInfo[path] === "")
+						) {
+							return;
+						}
 						updatedErrors[path] = err.message;
 					}
 				});
-				isValid = false;
+				isValid = Object.keys(updatedErrors).length === 0;
 			}
 		}
 

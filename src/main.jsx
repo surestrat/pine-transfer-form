@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import "@utils/icon-polyfill.js"; // Import icon polyfill first
 import "@styles/index.css";
 import App from "./App.jsx";
 

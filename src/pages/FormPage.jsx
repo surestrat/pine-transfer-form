@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
-// Updated import path to use alias for component within src
-import LeadForm from "@forms/LeadForm.jsx"; // Use the new alias
+// Updated import path to use proper component import
+import LeadForm from "@components/forms/LeadForm.jsx";
 import Logo from "@components/ui/Logo"; // Use alias for consistency
 import "@styles/FormPage.css"; // Import converted CSS
 

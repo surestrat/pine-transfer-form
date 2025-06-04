@@ -34,6 +34,25 @@ html {
 	--border-focus: #14b8a6; /* Using teal-500 */
 }
 
+/* SVG Compatibility for Icons */
+.no-svg-support svg {
+	display: none !important;
+}
+
+.no-svg-support .lucide-icon:after {
+	content: "■";
+	font-size: 18px;
+	color: inherit;
+}
+
+.no-svg-support .logo-icon-wrapper:after {
+	content: "★";
+	font-size: 24px;
+	color: white;
+	display: block;
+	text-align: center;
+}
+
 /* Flexbox Fallbacks */
 .flex {
 	display: block;

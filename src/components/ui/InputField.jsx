@@ -14,6 +14,7 @@ export const InputField = ({
 	pattern,
 	placeholder,
 	icon: Icon,
+	optional = false,
 }) => {
 	const [focused, setFocused] = useState(false);
 	const [touched, setTouched] = useState(false);
@@ -33,7 +34,8 @@ export const InputField = ({
 		setIsOldBrowser(isIE || isOldChrome);
 	}, []);
 
-	const isValid = touched && value && !error;
+	const isValid =
+		touched && (optional ? !value || (value && !error) : value && !error);
 
 	const handleBlur = (e) => {
 		if (onChange) {

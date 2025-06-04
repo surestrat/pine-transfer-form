@@ -76,11 +76,13 @@ const LeadForm = () => {
 		}
 
 		setIsSubmitting(true);
-
 		try {
-			// Compose payload for API
+			// Compose payload for API - ensure optional fields have empty string values if missing
 			const payload = {
 				...customer_info,
+				email: customer_info.email || "", // Ensure email is at least empty string
+				id_number: customer_info.id_number || "", // Ensure id_number is at least empty string
+				quote_id: customer_info.quote_id || "", // Ensure quote_id is at least empty string
 				agent_name: agent_info.agent_name,
 				branch_name: agent_info.branch_name,
 			};
@@ -163,35 +165,39 @@ const LeadForm = () => {
 						icon={User}
 					/>
 				</motion.div>
-			</div>
+			</div>{" "}
 			<motion.div
 				initial={{ y: 10, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ delay: 0.2 }}
 			>
+				{" "}
 				<InputField
-					label="Email Address"
+					label="Email Address (Optional)"
 					name="email"
 					type="email"
-					value={customer_info.email}
+					value={customer_info.email || ""}
 					onChange={handleChange}
 					error={errors.email}
-					required
 					icon={Mail}
+					optional={true}
+					required={false}
 				/>
-			</motion.div>
+			</motion.div>{" "}
 			<motion.div
 				initial={{ y: 10, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ delay: 0.25 }}
 			>
 				<InputField
-					label="ID Number"
+					label="ID Number (Optional)"
 					name="id_number"
-					value={customer_info.id_number}
+					value={customer_info.id_number || ""}
 					onChange={handleChange}
 					error={errors.id_number}
 					icon={FileText}
+					optional={true}
+					required={false}
 				/>
 			</motion.div>
 			<motion.div

@@ -1,0 +1,58 @@
+/* Logo.css - Standard CSS extracted from Tailwind classes */
+
+.logo-container {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+}
+
+.logo-icon-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 0.75rem; /* rounded-xl */
+	background-image: linear-gradient(to bottom right, #14b8a6, #0f766e);
+	padding: 0.625rem; /* p-2.5 */
+	margin-right: 0.75rem; /* mr-3 */
+	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+		0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+	border: 1px solid rgba(45, 212, 191, 0.3); /* border border-teal-400/30 */
+	box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1); /* ring-4 ring-teal-500/10 */
+}
+
+.logo-icon {
+	color: white;
+	filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)); /* drop-shadow-md */
+}
+
+/* Fallback for icons when SVG is not supported */
+.no-svg-support .logo-shield {
+	display: none;
+}
+
+.no-svg-support .logo-icon-wrapper:before {
+	content: "🛡️";
+	font-size: 24px;
+	display: block;
+	text-align: center;
+}
+
+.logo-text-container {
+	display: flex;
+	flex-direction: column;
+}
+
+.logo-title {
+	font-weight: 700; /* font-bold */
+	font-size: 1.5rem; /* text-2xl */
+	color: white; /* text-white */
+	letter-spacing: -0.025em; /* tracking-tight */
+}
+
+.logo-subtitle {
+	font-size: 0.75rem; /* text-xs */
+	color: #2dd4bf; /* Direct color instead of variable */
+	margin-top: -0.25rem; /* -mt-1 */
+	letter-spacing: 0.025em; /* tracking-wide */
+	font-weight: 600; /* Make it more visible */
+}

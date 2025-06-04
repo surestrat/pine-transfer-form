@@ -1,0 +1,91 @@
+/* Icons.css - CSS for Lucide icons compatibility */
+
+/* Base icon styles */
+.lucide {
+	width: 1em;
+	height: 1em;
+	stroke-width: 1.5;
+	stroke: currentColor;
+	fill: none;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	display: inline-block;
+}
+
+/* Ensure better rendering in older browsers */
+svg {
+	shape-rendering: geometricPrecision;
+	text-rendering: optimizeLegibility;
+}
+
+/* Fallback styles for browsers without SVG support */
+.no-svg-support .lucide {
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	position: relative;
+}
+
+.no-svg-support .lucide:before {
+	content: "□";
+	display: inline-block;
+	font-size: inherit;
+	color: inherit;
+}
+
+/* Specific icon fallbacks for common icons */
+.no-svg-support .lucide-lock:before {
+	content: "🔒";
+}
+.no-svg-support .lucide-check:before {
+	content: "✓";
+}
+.no-svg-support .lucide-alert-circle:before {
+	content: "⚠";
+}
+.no-svg-support .lucide-user:before {
+	content: "👤";
+}
+.no-svg-support .lucide-mail:before {
+	content: "✉";
+}
+.no-svg-support .lucide-phone:before {
+	content: "📞";
+}
+.no-svg-support .lucide-file-text:before {
+	content: "📄";
+}
+.no-svg-support .lucide-shield-check:before {
+	content: "🛡";
+}
+.no-svg-support .lucide-loader2:before {
+	content: "⟳";
+}
+.no-svg-support .lucide-check-circle:before {
+	content: "✓";
+}
+.no-svg-support .lucide-arrow-right:before {
+	content: "→";
+}
+.no-svg-support .lucide-refresh-cw:before {
+	content: "↻";
+}
+.no-svg-support .lucide-external-link:before {
+	content: "↗";
+}
+
+/* Animation for loader */
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.loading-icon {
+	animation: spin 0.8s linear infinite;
+}
+
+.no-svg-support .loading-icon:before {
+	animation: spin 1s linear infinite;
+	display: inline-block;
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <title>SureStrat Icon</title>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(2, 2)">
+            <path d="M14,0 C21.732,0 28,6.268 28,14 C28,21.732 21.732,28 14,28 C6.268,28 0,21.732 0,14 C0,6.268 6.268,0 14,0 Z" fill="#14B8A6"></path>
+            <path d="M14,4 C19.523,4 24,8.477 24,14 C24,19.523 19.523,24 14,24 C8.477,24 4,19.523 4,14 C4,8.477 8.477,4 14,4 Z" fill="#0F766E"></path>
+            <path d="M14,8 C16.2,8 18,9.8 18,12 L18,16 C18,18.2 16.2,20 14,20 C11.8,20 10,18.2 10,16 L10,12 C10,9.8 11.8,8 14,8 Z" fill="#FFFFFF"></path>
+            <polygon fill="#FFFFFF" points="13 12 15 12 15 20 13 20"></polygon>
+        </g>
+    </g>
+</svg>

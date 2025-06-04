@@ -12,15 +12,15 @@ function App() {
 				fallback={<p>Something went wrong loading the application.</p>}
 			>
 				{" "}
-				{/* Wrap with ErrorBoundary */}
+				{/* Wrap with ErrorBoundary */}{" "}
 				<div
-					className="min-h-screen relative overflow-hidden font-sans bg-[#0a0c10]"
+					className="app-container"
 					style={{ background: "#0a0c10" }} // Deeper black background
 				>
 					{/* Updated dark background */}
 					<GradientBackground />
 					<motion.div
-						className="relative z-10 w-full max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:py-20" // Reduced max-width, increased vertical padding
+						className="app-content" // Using custom class instead of Tailwind
 						initial={{ opacity: 0, y: 10 }} // Added subtle entry animation
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.6, ease: "easeOut" }}
