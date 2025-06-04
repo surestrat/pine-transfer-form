@@ -18,12 +18,17 @@ import "@styles/LeadForm.css";
 
 const branchOptions = [
 	{ value: "", label: "Select Office..." },
-	{ value: "Lenasia-HO", label: "Lenasia-HO" },
-	{ value: "Lenasia-Moe", label: "Lenasia-Moe" },
+	{ value: "Lenasia-HeadOffice", label: "Lenasia-HO" },
+	{ value: "Lenasia-Riaad", label: "Lenasia-Riaad" },
 	{ value: "Lenasia-Ziyaad", label: "Lenasia-Ziyaad" },
 	{ value: "Lenasia-Tariq", label: "Lenasia-Tariq" },
 	{ value: "Rosebank-Irshad", label: "Rosebank-Irshad" },
-	{ value: "Vereeniging-Ahmed", label: "Vereeniging-Ahmed" },
+	{ value: "Vereeniging-Nur", label: "Vereeniging-Nur" },
+	{ value: "Durban-Alfred", label: "Durban-Alfred" },
+	{ value: "East-Rand-Johan", label: "East Rand-Johan" },
+	{ value: "Pretoria-Tanya", label: "Pretoria-Tanya" },
+	{ value: "Rivonia-dean", label: "Rivonia-Dean" },
+
 	// Remove the empty object
 	// Add more branches as needed
 ];
