@@ -4,9 +4,9 @@ import { z } from "zod";
 const formSchema = z.object({
 	first_name: z.string().min(2, "First name must be at least 2 characters"),
 	last_name: z.string().min(2, "Last name must be at least 2 characters"),
-	email: z.string().email("Invalid email address").optional(),
-	id_number: z.string().min(13, "ID number must be at least 13 characters").optional(),
-	quote_id: z.string().optional(), // Make optional as per API docs
+	email: z.string().email("Invalid email address").optional().transform(e => e || undefined),
+	id_number: z.string().min(13, "ID number must be at least 13 characters").optional().transform(e => e || undefined),
+	quote_id: z.string().optional().transform(e => e || undefined),
 	contact_number: z.string().min(10, "Contact number must be at least 10 digits"),
 });
 
@@ -91,13 +91,12 @@ export const useFormStore = create((set, get) => ({
 		const updatedErrors = {};
 		let isValid = true;
 
-		// Create a sanitized copy that converts empty strings to undefined for optional fields
+		// Sanitize the customer info by converting empty strings to undefined
 		const sanitizedCustomerInfo = {
 			...customer_info,
-			// Convert empty strings to undefined for optional fields
-			email: customer_info.email || undefined,
-			id_number: customer_info.id_number || undefined,
-			quote_id: customer_info.quote_id || undefined,
+			email: customer_info.email?.trim() || undefined,
+			id_number: customer_info.id_number?.trim() || undefined,
+			quote_id: customer_info.quote_id?.trim() || undefined,
 		};
 
 		try {
@@ -105,9 +104,14 @@ export const useFormStore = create((set, get) => ({
 		} catch (error) {
 			if (error instanceof z.ZodError) {
 				error.errors.forEach((err) => {
-					const path = err.path[0];
-					if (path !== undefined) {
-						updatedErrors[path] = err.message;
+					if (err.path[0]) {
+						// Don't add errors for optional fields that are undefined or empty
+						if (!(
+							(err.path[0] === 'email' || err.path[0] === 'id_number' || err.path[0] === 'quote_id') &&
+							!sanitizedCustomerInfo[err.path[0]]
+						)) {
+							updatedErrors[err.path[0]] = err.message;
+						}
 					}
 				});
 				isValid = Object.keys(updatedErrors).length === 0;
@@ -119,9 +123,8 @@ export const useFormStore = create((set, get) => ({
 		} catch (error) {
 			if (error instanceof z.ZodError) {
 				error.errors.forEach((err) => {
-					const path = err.path[0];
-					if (path !== undefined) {
-						updatedErrors[path] = err.message;
+					if (err.path[0]) {
+						updatedErrors[err.path[0]] = err.message;
 					}
 				});
 				isValid = false;
@@ -129,7 +132,6 @@ export const useFormStore = create((set, get) => ({
 		}
 
 		set({ errors: updatedErrors });
-
 		return isValid;
 	},
 
