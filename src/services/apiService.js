@@ -18,7 +18,7 @@ export const submitForm = async (payload) => {
 			customer_info: {
 				first_name: payload.first_name,
 				last_name: payload.last_name,
-				email: payload.email,
+				email: payload.email || undefined,
 				contact_number: payload.contact_number,
 				id_number: payload.id_number || undefined,
 				quote_id: payload.quote_id || undefined,
@@ -48,25 +48,38 @@ export const submitForm = async (payload) => {
 		console.error("API Error details:", error);
 
 		if (error.response) {
-			// The server responded with a status code outside the 2xx range
 			console.error("Response status:", error.response.status);
 			console.error("Response data:", error.response.data);
 
-			// Extract error message from response if available
+			// Handle 422 Validation Error specifically
+			if (error.response.status === 422) {
+				const errData = error.response.data;
+				if (Array.isArray(errData.detail)) {
+					// Format validation errors into a user-friendly message
+					const validationErrors = errData.detail
+						.map((err) => {
+							const field = err.loc[err.loc.length - 1];
+							return `${field}: ${err.msg}`;
+						})
+						.join(", ");
+					throw new Error(validationErrors);
+				}
+				throw new Error(errData.detail || "Validation error occurred");
+			}
+
+			// Handle other error responses
 			const errData = error.response.data;
-			const message =
+			throw new Error(
 				errData.error ||
-				errData.detail ||
-				errData.message ||
-				`Server error: ${error.response.status} ${error.response.statusText}`;
-			throw new Error(message);
+					errData.detail ||
+					errData.message ||
+					`Server error: ${error.response.status} ${error.response.statusText}`
+			);
 		} else if (error.request) {
-			// The request was made but no response was received
 			throw new Error(
 				"No response received from server. Please check your internet connection."
 			);
 		} else {
-			// Something happened in setting up the request
 			throw new Error(`Request setup error: ${error.message}`);
 		}
 	}

@@ -77,51 +77,35 @@ const LeadForm = () => {
 
 		setIsSubmitting(true);
 		try {
-			// Compose payload for API - ensure optional fields have empty string values if missing
 			const payload = {
 				...customer_info,
-				email: customer_info.email || "", // Ensure email is at least empty string
-				id_number: customer_info.id_number || "", // Ensure id_number is at least empty string
-				quote_id: customer_info.quote_id || "", // Ensure quote_id is at least empty string
 				agent_name: agent_info.agent_name,
 				branch_name: agent_info.branch_name,
 			};
 
-			// Log payload for debugging
 			console.log("Preparing payload:", payload);
 
 			const apiResponse = await submitForm(payload);
 			console.log("Received API response:", apiResponse);
 
-			// Store the API response in the form store
 			setApiResponse(apiResponse);
-
-			// Navigate to success page
 			navigate("/success");
 		} catch (err) {
 			console.error("Form submission error:", err);
 
-			// Create a user-friendly error message
-			let errorMessage =
-				"There was an error submitting your information. Please try again later.";
+			// Extract the error message
+			const errorMessage = err.message || "An unexpected error occurred. Please try again.";
 
-			if (err.message) {
-				if (
-					err.message.includes("Network Error") ||
-					err.message.includes("internet")
-				) {
-					errorMessage = "Please check your internet connection and try again.";
-				} else if (err.message.includes("timeout")) {
-					errorMessage = "The request timed out. Please try again later.";
-				} else if (err.message.includes("405")) {
-					errorMessage =
-						"Technical error: The API configuration needs to be updated. Please contact support.";
-				} else {
-					errorMessage = err.message;
-				}
+			// Check if it's a validation error (from 422 response)
+			if (err.message.includes(':')) {
+				setError("Please correct the following errors: " + errorMessage);
+			} else if (err.message.includes("Network Error")) {
+				setError("Please check your internet connection and try again.");
+			} else if (err.message.includes("timeout")) {
+				setError("The request timed out. Please try again later.");
+			} else {
+				setError(errorMessage);
 			}
-
-			setError(errorMessage);
 		} finally {
 			setIsSubmitting(false);
 		}
