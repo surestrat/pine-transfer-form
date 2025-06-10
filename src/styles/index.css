@@ -260,8 +260,8 @@ textarea::placeholder {
 }
 
 /* Import browser compatibility CSS */
-@import "./browser-compatibility.css";
-@import "./icons.css";
+/* @import "./browser-compatibility.css";
+@import "./icons.css"; */
 
 /* App Container Styles */
 .app-container {

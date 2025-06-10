@@ -4,15 +4,10 @@ import { z } from "zod";
 const formSchema = z.object({
 	first_name: z.string().min(2, "First name must be at least 2 characters"),
 	last_name: z.string().min(2, "Last name must be at least 2 characters"),
-	email: z.string().email("Invalid email address").or(z.literal("")),
-	id_number: z
-		.string()
-		.min(13, "ID number must be at least 13 characters")
-		.or(z.literal("")), // Allow empty string
+	email: z.string().email("Invalid email address").optional(),
+	id_number: z.string().min(13, "ID number must be at least 13 characters").optional(),
 	quote_id: z.string().optional(), // Make optional as per API docs
-	contact_number: z
-		.string()
-		.min(10, "Contact number must be at least 10 digits"),
+	contact_number: z.string().min(10, "Contact number must be at least 10 digits"),
 });
 
 const agentSchema = z.object({
@@ -44,22 +39,20 @@ export const useFormStore = create((set, get) => ({
 	updateField: (field, value) => {
 		set((state) => {
 			const updatedFormData = { ...state.customer_info, [field]: value };
-
 			const updatedErrors = { ...state.errors };
 
-			// Special handling for optional fields with empty values
-			if ((field === "email" || field === "id_number") && value === "") {
-				// Empty value is valid for these optional fields
+			try {
+				// For optional fields, convert empty string to undefined
+				const valueToValidate =
+					(field === "email" || field === "id_number" || field === "quote_id") && value === ""
+						? undefined
+						: value;
+
+				formSchema.shape[field].parse(valueToValidate);
 				delete updatedErrors[field];
-			} else {
-				try {
-					formSchema.shape[field].parse(value);
-					delete updatedErrors[field];
-				} catch (error) {
-					if (error instanceof z.ZodError) {
-						updatedErrors[field] =
-							error.errors[0]?.message || `Invalid ${field}`;
-					}
+			} catch (error) {
+				if (error instanceof z.ZodError) {
+					updatedErrors[field] = error.errors[0]?.message || `Invalid ${field}`;
 				}
 			}
 
@@ -98,13 +91,13 @@ export const useFormStore = create((set, get) => ({
 		const updatedErrors = {};
 		let isValid = true;
 
-		// Create a sanitized copy with empty strings for optional fields if needed
+		// Create a sanitized copy that converts empty strings to undefined for optional fields
 		const sanitizedCustomerInfo = {
 			...customer_info,
-			// Ensure empty strings for optional fields
-			email: customer_info.email || "",
-			id_number: customer_info.id_number || "",
-			quote_id: customer_info.quote_id || "",
+			// Convert empty strings to undefined for optional fields
+			email: customer_info.email || undefined,
+			id_number: customer_info.id_number || undefined,
+			quote_id: customer_info.quote_id || undefined,
 		};
 
 		try {
@@ -114,14 +107,6 @@ export const useFormStore = create((set, get) => ({
 				error.errors.forEach((err) => {
 					const path = err.path[0];
 					if (path !== undefined) {
-						// Skip validation errors for empty optional fields
-						if (
-							(path === "email" || path === "id_number") &&
-							(!sanitizedCustomerInfo[path] ||
-								sanitizedCustomerInfo[path] === "")
-						) {
-							return;
-						}
 						updatedErrors[path] = err.message;
 					}
 				});
