@@ -134,28 +134,30 @@ export const useFormStore = create((set, get) => ({
 	},
 
 	setApiResponse: (response) => {
-		// Extract redirect URL from the response based on the structure returned by your FastAPI
+		// Clean up empty optional fields before submission
+		const cleanedCustomerInfo = { ...get().customer_info };
+		
+		// Remove empty optional fields
+		if (!cleanedCustomerInfo.email) delete cleanedCustomerInfo.email;
+		if (!cleanedCustomerInfo.id_number) delete cleanedCustomerInfo.id_number;
+		if (!cleanedCustomerInfo.quote_id) delete cleanedCustomerInfo.quote_id;
+
+		// Update the store with cleaned data
+		set(state => ({
+			...state,
+			customer_info: cleanedCustomerInfo
+		}));
+
+		// Extract redirect URL from the response
 		let redirectUrl = null;
 
 		if (response) {
-			// Direct redirect_url from your FastAPI response
 			if (response.redirect_url) {
 				redirectUrl = response.redirect_url;
-			}
-			// Nested in api_response
-			else if (
-				response.api_response &&
-				typeof response.api_response === "object"
-			) {
-				// If api_response is already an object
-				if (
-					response.api_response.data &&
-					response.api_response.data.redirect_url
-				) {
+			} else if (response.api_response && typeof response.api_response === "object") {
+				if (response.api_response.data && response.api_response.data.redirect_url) {
 					redirectUrl = response.api_response.data.redirect_url;
-				}
-				// If api_response is a string (JSON)
-				else if (typeof response.api_response === "string") {
+				} else if (typeof response.api_response === "string") {
 					try {
 						const parsedResponse = JSON.parse(response.api_response);
 						if (parsedResponse.data && parsedResponse.data.redirect_url) {
@@ -167,8 +169,6 @@ export const useFormStore = create((set, get) => ({
 				}
 			}
 		}
-
-		console.log("Setting redirect URL:", redirectUrl);
 
 		set({
 			apiResponse: response,

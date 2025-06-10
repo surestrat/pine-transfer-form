@@ -12,8 +12,8 @@
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<!-- Link to Inter font included in index.css, but preconnect helps performance -->
 
-		<!-- Browser detector - must be first script to apply fixes early -->
-		<script src="./src/utils/browser-detector.js"></script>
+		<!-- Polyfills and compatibility scripts -->
+		<script type="module" src="/src/utils/browser-detector.js"></script>
 
 		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 		<!--[if lt IE 9]>
@@ -28,11 +28,10 @@
 	</head>
 	<body>
 		<div id="root"></div>
-		<!-- Preload icon polyfill -->
-		<script src="./src/utils/icon-polyfill.js"></script>
+		<!-- IE polyfills and icon support -->
+		<script type="module" src="/src/utils/icon-polyfill.js"></script>
 		<script type="module" src="/src/main.jsx"></script>
-		<!-- IE polyfills script - will only run in older browsers -->
-		<script src="./src/utils/ie-polyfills.js"></script>
+		<script type="module" src="/src/utils/ie-polyfills.js"></script>
 		<!-- Run CSS vars polyfill -->
 		<script>
 			// Initialize CSS variables polyfill for older browsers

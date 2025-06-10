@@ -1,4 +1,6 @@
-/* Import Inter font */
+/* Import CSS dependencies */
+@import "./browser-compatibility.css";
+@import "./icons.css";
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 /* Base Styles */
@@ -259,10 +261,6 @@ textarea::placeholder {
 	}
 }
 
-/* Import browser compatibility CSS */
-/* @import "./browser-compatibility.css";
-@import "./icons.css"; */
-
 /* App Container Styles */
 .app-container {
 	min-height: 100vh;
@@ -374,6 +372,7 @@ textarea {
 		input,
 		button,
 		a {
+			transform: translateZ(0);
 			-webkit-transform: translateZ(0);
 		}
 
@@ -381,11 +380,13 @@ textarea {
 		.button,
 		input,
 		a {
+			transition: none;
 			-webkit-transition: none;
 		}
 
 		/* Reduce or eliminate shadows for better performance */
 		.shadow-xl {
+			box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 			-webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 		}
 	}

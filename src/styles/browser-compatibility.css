@@ -53,6 +53,39 @@ html {
 	text-align: center;
 }
 
+/* IE Compatibility */
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    /* Display inline fix */
+    .inline-element {
+        display: inline-block;
+        /* IE hack without using * selector */
+        zoom: 1;
+    }
+
+    /* Size fixes */
+    .full-size {
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Fix inline-block display issues */
+    .inline-block {
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    /* Additional IE fixes */
+    .ie-flex {
+        display: table;
+        width: 100%;
+    }
+
+    .ie-flex > * {
+        display: table-cell;
+        vertical-align: middle;
+    }
+}
+
 /* Flexbox Fallbacks */
 .flex {
 	display: block;

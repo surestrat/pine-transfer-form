@@ -92,21 +92,25 @@
 
 /* Additional browser compatibility fixes */
 .button {
-	/* Old browser box model fix */
-	*display: inline;
-	*zoom: 1;
+	/* Old browser box model fix using modern approach */
+	display: inline-block;
+	vertical-align: middle;
 
 	/* Box shadow prefixes */
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+		0 2px 4px -1px rgba(0, 0, 0, 0.06);
 	-webkit-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
 		0 2px 4px -1px rgba(0, 0, 0, 0.06);
 	-moz-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
 		0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
-	/* Border radius prefixes */
+	/* Border radius */
+	border-radius: 0.75rem;
 	-webkit-border-radius: 0.75rem;
 	-moz-border-radius: 0.75rem;
 
-	/* Transition prefixes */
+	/* Transition */
+	transition: all 0.2s ease-in-out;
 	-webkit-transition: all 0.2s ease-in-out;
 	-moz-transition: all 0.2s ease-in-out;
 	-o-transition: all 0.2s ease-in-out;

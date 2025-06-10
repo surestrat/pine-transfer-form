@@ -1,12 +1,34 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import fs from "fs";
 
 // https://vite.dev/config/
 export default defineConfig({
 	plugins: [
 		react(),
-		// Email middleware plugin removed - will be implemented later
+		// Copy polyfills and utility scripts to build output
+		{
+			name: 'copy-utils',
+			enforce: 'post',
+			apply: 'build',
+			generateBundle() {
+				// These files will be copied to dist/src/utils/
+				const utilFiles = [
+					'browser-detector.js',
+					'icon-polyfill.js',
+					'ie-polyfills.js'
+				];
+				
+				utilFiles.forEach(file => {
+					this.emitFile({
+						type: 'asset',
+						fileName: `src/utils/${file}`,
+						source: fs.readFileSync(`src/utils/${file}`, 'utf-8')
+					});
+				});
+			}
+		}
 	],
 	resolve: {
 		alias: {

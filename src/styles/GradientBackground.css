@@ -70,9 +70,9 @@
 	top: 0;
 	right: 0;
 	bottom: 0;
-	/* For IE7 */
-	*width: 100%;
-	*height: 100%;
+	/* Modern approach for full size */
+	width: 100%;
+	height: 100%;
 	overflow: hidden;
 }
 
