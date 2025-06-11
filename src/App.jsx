@@ -27,6 +27,11 @@ function App() {
 					>
 						<Routes>
 							<Route path="/" element={<FormPage />} />
+							{/* ViciDial URL format route */}
+							<Route
+								path="/:user/:first_name/:last_name/:phone_number"
+								element={<FormPage />}
+							/>
 							<Route path="/success" element={<SuccessPage />} />
 							{/* Add a fallback route if needed */}
 							{/* <Route path="*" element={<NotFoundPage />} /> */}

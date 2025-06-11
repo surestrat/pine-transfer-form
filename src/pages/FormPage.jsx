@@ -1,13 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
-// Updated import path to use proper component import
+import { useParams } from "react-router-dom";
 import LeadForm from "@components/forms/LeadForm.jsx";
-import Logo from "@components/ui/Logo"; // Use alias for consistency
-import "@styles/FormPage.css"; // Import converted CSS
+import Logo from "@components/ui/Logo";
+import { useFormStore } from "@store/formStore";
+import "@styles/FormPage.css";
 
 const FormPage = () => {
+	const { user, first_name, last_name, phone_number } = useParams();
+	const { updateField, updateAgentInfo } = useFormStore();
 	const [isOldBrowser, setIsOldBrowser] = useState(false);
+
+	// Handle ViciDial parameters
+	useEffect(() => {
+		if (first_name) {
+			updateField('first_name', decodeURIComponent(first_name).replace(/--[AB]--/g, ''));
+		}
+		if (last_name) {
+			updateField('last_name', decodeURIComponent(last_name).replace(/--[AB]--/g, ''));
+		}
+		if (phone_number) {
+			updateField('contact_number', decodeURIComponent(phone_number).replace(/--[AB]--/g, ''));
+		}
+		if (user) {
+			// ViciDial agent name will be the user parameter
+			updateAgentInfo('agent_name', decodeURIComponent(user).replace(/--[AB]--/g, ''));
+		}
+	}, [user, first_name, last_name, phone_number, updateField, updateAgentInfo]);
 
 	// Check if we're in an older browser environment
 	useEffect(() => {
