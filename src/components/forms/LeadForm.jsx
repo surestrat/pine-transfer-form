@@ -8,6 +8,7 @@ import {
 	User,
 	Phone,
 	FileText,
+	Mail,
 } from "lucide-react";
 import { useFormStore } from "@store/formStore";
 import { InputField } from "@components/ui/InputField";
@@ -76,22 +77,27 @@ const LeadForm = () => {
 
 		setIsSubmitting(true);
 		try {
-			// Only include non-empty fields
+			// Start with only required fields
 			const customerInfo = {
 				first_name: customer_info.first_name,
 				last_name: customer_info.last_name,
 				contact_number: customer_info.contact_number,
 			};
 
-			// Only add optional fields if they have a value
-			if (customer_info.email?.trim()) {
-				customerInfo.email = customer_info.email.trim();
+			// Add optional fields only if they exist and have content
+			if (customer_info.quote_id) {
+				const trimmedQuoteId = customer_info.quote_id.trim();
+				if (trimmedQuoteId.length > 0) customerInfo.quote_id = trimmedQuoteId;
 			}
-			if (customer_info.id_number?.trim()) {
-				customerInfo.id_number = customer_info.id_number.trim();
+
+			if (customer_info.email) {
+				const trimmedEmail = customer_info.email.trim();
+				if (trimmedEmail.length > 0) customerInfo.email = trimmedEmail;
 			}
-			if (customer_info.quote_id?.trim()) {
-				customerInfo.quote_id = customer_info.quote_id.trim();
+
+			if (customer_info.id_number) {
+				const trimmedIdNumber = customer_info.id_number.trim();
+				if (trimmedIdNumber.length > 0) customerInfo.id_number = trimmedIdNumber;
 			}
 
 			const payload = {
