@@ -125,9 +125,39 @@
 	margin-top: 0.125rem; /* mt-0.5 */
 }
 
+.alert-message-container {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	flex: 1;
+}
+
+.alert-action-button {
+	align-self: flex-start;
+	background-color: rgba(239, 68, 68, 0.2);
+	color: #fca5a5;
+	padding: 0.5rem 1rem;
+	border-radius: 0.5rem;
+	font-size: 0.875rem;
+	font-weight: 500;
+	border: 1px solid rgba(239, 68, 68, 0.3);
+	cursor: pointer;
+	transition: all 0.2s ease-in-out;
+}
+
+.alert-action-button:hover {
+	background-color: rgba(239, 68, 68, 0.3);
+	border-color: rgba(239, 68, 68, 0.4);
+}
+
+.alert-action-button:focus {
+	outline: none;
+	box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.4);
+}
+
 .alert-message {
-	font-size: 0.875rem; /* text-sm */
-	color: #fca5a5; /* text-red-300 */
+	white-space: pre-line;
+	margin: 0;
 }
 
 .form-footer {

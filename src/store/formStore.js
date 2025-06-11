@@ -5,7 +5,7 @@ const formSchema = z.object({
 	first_name: z.string().min(2, "First name must be at least 2 characters"),
 	last_name: z.string().min(2, "Last name must be at least 2 characters"),
 	quote_id: z.string().optional().transform(e => e || undefined),
-	email: z.string().email("Invalid email format").optional().transform(e => e || undefined),
+	email: z.string().email("Invalid email format").min(1, "Email is required"),
 	id_number: z.string().optional().transform(e => e || undefined),
 	contact_number: z.string().min(10, "Contact number must be at least 10 digits"),
 });
@@ -43,7 +43,7 @@ export const useFormStore = create((set, get) => ({
 
 			try {
 				// For optional fields, convert empty string to undefined
-				const isOptionalField = ['quote_id', 'email', 'id_number'].includes(field);
+				const isOptionalField = ['quote_id', 'id_number'].includes(field);
 				const valueToValidate = isOptionalField && value === "" ? undefined : value;
 
 				formSchema.shape[field].parse(valueToValidate);
@@ -137,7 +137,6 @@ export const useFormStore = create((set, get) => ({
 		
 		// Remove empty optional fields
 		if (!cleanedCustomerInfo.quote_id) delete cleanedCustomerInfo.quote_id;
-		if (!cleanedCustomerInfo.email) delete cleanedCustomerInfo.email;
 		if (!cleanedCustomerInfo.id_number) delete cleanedCustomerInfo.id_number;
 
 		// Update the store with cleaned data

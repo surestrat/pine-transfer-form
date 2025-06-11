@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -37,6 +37,20 @@ const LeadForm = () => {
 	const navigate = useNavigate();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState(null);
+	const [retryAttempts, setRetryAttempts] = useState(0);
+	const maxRetries = 3;
+
+	// Add timeout ref for cleanup
+	const submitTimeoutRef = useRef(null);
+
+	// Cleanup on unmount
+	useEffect(() => {
+		return () => {
+			if (submitTimeoutRef.current) {
+				clearTimeout(submitTimeoutRef.current);
+			}
+		};
+	}, []);
 
 	const {
 		customer_info,
@@ -46,6 +60,7 @@ const LeadForm = () => {
 		errors,
 		validateForm,
 		setApiResponse,
+		resetForm,
 	} = useFormStore();
 
 	const handleChange = (e) => {
@@ -58,12 +73,75 @@ const LeadForm = () => {
 		updateAgentInfo(name, value);
 	};
 
+	const handleFormReset = () => {
+		resetForm();
+		setError(null);
+		setRetryAttempts(0);
+	};
+
+	const handleRetry = () => {
+		if (retryAttempts < maxRetries) {
+			setError(null);
+			setRetryAttempts((prev) => prev + 1);
+			handleSubmit();
+		}
+	};
+
+	const formatErrorMessage = (err) => {
+		if (err instanceof ValidationError) {
+			if (Array.isArray(err.details)) {
+				return err.details.map((detail) => {
+					const field = detail.loc[detail.loc.length - 1];
+					const fieldLabel = {
+						first_name: "First Name",
+						last_name: "Last Name",
+						email: "Email Address",
+						contact_number: "Contact Number",
+						agent_name: "Agent Name",
+						branch_name: "Office",
+					}[field] || field;
+					return `${fieldLabel}: ${detail.msg}`;
+				}).join("\n");
+			}
+			return err.details || "Please check your input and try again.";
+		}
+
+		if (err instanceof NetworkError) {
+			return {
+				message: err.message,
+				action: "Retry",
+				handler: handleRetry,
+			};
+		}
+
+		if (err instanceof ApiError) {
+			switch (err.status) {
+				case 429:
+					submitTimeoutRef.current = setTimeout(() => {
+						setError(null);
+					}, 5000);
+					return "Too many attempts. Please wait a moment.";
+				case 500:
+					return {
+						message: err.message,
+						action: "Start Over",
+						handler: handleFormReset,
+					};
+				default:
+					return err.message;
+			}
+		}
+
+		return "An unexpected error occurred. Please try again.";
+	};
+
 	const handleSubmit = async (e) => {
-		e.preventDefault();
+		if (e) {
+			e.preventDefault();
+		}
 		setError(null);
 
 		const isValid = validateForm();
-
 		if (!isValid) {
 			const firstErrorField = Object.keys(errors)[0];
 			if (firstErrorField) {
@@ -71,6 +149,22 @@ const LeadForm = () => {
 					`[name="${firstErrorField}"]`
 				);
 				inputElement?.focus();
+
+				// Show validation error message
+				const errorMessages = Object.entries(errors)
+					.map(([field, message]) => {
+						const fieldLabel = {
+							first_name: "First Name",
+							last_name: "Last Name",
+							email: "Email Address",
+							contact_number: "Contact Number",
+							agent_name: "Agent Name",
+							branch_name: "Office",
+						}[field] || field;
+						return `${fieldLabel}: ${message}`;
+					})
+					.join("\n");
+				setError(errorMessages);
 			}
 			return;
 		}
@@ -90,10 +184,8 @@ const LeadForm = () => {
 				if (trimmedQuoteId.length > 0) customerInfo.quote_id = trimmedQuoteId;
 			}
 
-			if (customer_info.email) {
-				const trimmedEmail = customer_info.email.trim();
-				if (trimmedEmail.length > 0) customerInfo.email = trimmedEmail;
-			}
+			// Email is required
+			customerInfo.email = customer_info.email.trim();
 
 			if (customer_info.id_number) {
 				const trimmedIdNumber = customer_info.id_number.trim();
@@ -106,31 +198,16 @@ const LeadForm = () => {
 				branch_name: agent_info.branch_name,
 			};
 
-			console.log("Preparing payload:", payload);
-
 			const apiResponse = await submitForm(payload);
-			console.log("Received API response:", apiResponse);
 
 			setApiResponse(apiResponse);
 			navigate("/success");
 		} catch (err) {
-			console.error("Form submission error:", err);
-
-			// Check if it's a 422 validation error
-			if (err.response?.status === 422) {
-				const errorDetails = err.response.data.detail;
-				if (Array.isArray(errorDetails)) {
-					// Format validation errors
-					const errorMessages = errorDetails.map((detail) => {
-						const field = detail.loc[detail.loc.length - 1];
-						return `${field}: ${detail.msg}`;
-					});
-					setError(errorMessages.join(", "));
-				} else {
-					setError(errorDetails || "Validation error occurred");
-				}
+			const errorInfo = formatErrorMessage(err);
+			if (typeof errorInfo === "object") {
+				setError(errorInfo);
 			} else {
-				setError(err.message || "An unexpected error occurred. Please try again.");
+				setError({ message: errorInfo });
 			}
 		} finally {
 			setIsSubmitting(false);
@@ -183,15 +260,14 @@ const LeadForm = () => {
 			>
 				{" "}
 				<InputField
-					label="Email Address (Optional)"
+					label="Email Address"
 					name="email"
 					type="email"
 					value={customer_info.email || ""}
 					onChange={handleChange}
 					error={errors.email}
 					icon={Mail}
-					optional={true}
-					required={false}
+					required={true}
 				/>
 			</motion.div>{" "}
 			<motion.div
@@ -287,12 +363,25 @@ const LeadForm = () => {
 					>
 						<div className="alert-content">
 							<AlertCircle className="alert-icon" size={20} />
-							<p className="alert-message">{error}</p>
+							<div className="alert-message-container">
+								<p className="alert-message">
+									{error.message || error}
+								</p>
+								{error.action && (
+									<button
+										type="button"
+										onClick={error.handler}
+										className="alert-action-button"
+									>
+										{error.action}
+									</button>
+								)}
+							</div>
 						</div>
 					</motion.div>
 				)}
 			</AnimatePresence>
-			{/* ... Submission Button ... */}{" "}
+
 			<div className="form-footer">
 				<Button
 					type="submit"
@@ -303,7 +392,9 @@ const LeadForm = () => {
 					{isSubmitting ? (
 						<>
 							<Loader2 className="loading-icon" />
-							Submitting...
+							{retryAttempts > 0
+								? `Retrying... (${retryAttempts}/${maxRetries})`
+								: "Submitting..."}
 						</>
 					) : (
 						<>
