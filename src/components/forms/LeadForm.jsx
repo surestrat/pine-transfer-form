@@ -6,7 +6,6 @@ import {
 	AlertCircle,
 	Loader2,
 	User,
-	Mail,
 	Phone,
 	FileText,
 } from "lucide-react";
@@ -77,8 +76,26 @@ const LeadForm = () => {
 
 		setIsSubmitting(true);
 		try {
+			// Only include non-empty fields
+			const customerInfo = {
+				first_name: customer_info.first_name,
+				last_name: customer_info.last_name,
+				contact_number: customer_info.contact_number,
+			};
+
+			// Only add optional fields if they have a value
+			if (customer_info.email?.trim()) {
+				customerInfo.email = customer_info.email.trim();
+			}
+			if (customer_info.id_number?.trim()) {
+				customerInfo.id_number = customer_info.id_number.trim();
+			}
+			if (customer_info.quote_id?.trim()) {
+				customerInfo.quote_id = customer_info.quote_id.trim();
+			}
+
 			const payload = {
-				...customer_info,
+				...customerInfo,
 				agent_name: agent_info.agent_name,
 				branch_name: agent_info.branch_name,
 			};
@@ -93,18 +110,21 @@ const LeadForm = () => {
 		} catch (err) {
 			console.error("Form submission error:", err);
 
-			// Extract the error message
-			const errorMessage = err.message || "An unexpected error occurred. Please try again.";
-
-			// Check if it's a validation error (from 422 response)
-			if (err.message.includes(':')) {
-				setError("Please correct the following errors: " + errorMessage);
-			} else if (err.message.includes("Network Error")) {
-				setError("Please check your internet connection and try again.");
-			} else if (err.message.includes("timeout")) {
-				setError("The request timed out. Please try again later.");
+			// Check if it's a 422 validation error
+			if (err.response?.status === 422) {
+				const errorDetails = err.response.data.detail;
+				if (Array.isArray(errorDetails)) {
+					// Format validation errors
+					const errorMessages = errorDetails.map((detail) => {
+						const field = detail.loc[detail.loc.length - 1];
+						return `${field}: ${detail.msg}`;
+					});
+					setError(errorMessages.join(", "));
+				} else {
+					setError(errorDetails || "Validation error occurred");
+				}
 			} else {
-				setError(errorMessage);
+				setError(err.message || "An unexpected error occurred. Please try again.");
 			}
 		} finally {
 			setIsSubmitting(false);

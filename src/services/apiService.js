@@ -14,19 +14,16 @@ export const submitForm = async (payload) => {
 		console.log("Submitting to API URL:", API_URL);
 
 		// Format payload to match the server SubmissionData schema
-		const customerInfo = {
-			first_name: payload.first_name,
-			last_name: payload.last_name,
-			contact_number: payload.contact_number,
-		};
-
-		// Only add optional fields if they have a value
-		if (payload.email?.trim()) customerInfo.email = payload.email;
-		if (payload.id_number?.trim()) customerInfo.id_number = payload.id_number;
-		if (payload.quote_id?.trim()) customerInfo.quote_id = payload.quote_id;
-
 		const formattedPayload = {
-			customer_info: customerInfo,
+			customer_info: {
+				first_name: payload.first_name,
+				last_name: payload.last_name,
+				contact_number: payload.contact_number,
+				// Handle optional fields with explicit null values
+				email: payload.email || null,
+				id_number: payload.id_number || null,
+				quote_id: payload.quote_id || null,
+			},
 			agent_info: {
 				agent_name: payload.agent_name,
 				branch_name: payload.branch_name,
