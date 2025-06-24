@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
 import { useParams } from "react-router-dom";
 import LeadForm from "@components/forms/LeadForm.jsx";
