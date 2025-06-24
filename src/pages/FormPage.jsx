@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { Lock } from "lucide-react";
 import { useParams } from "react-router-dom";
 import LeadForm from "@components/forms/LeadForm.jsx";
@@ -15,17 +14,29 @@ const FormPage = () => {
 	// Handle ViciDial parameters
 	useEffect(() => {
 		if (first_name) {
-			updateField('first_name', decodeURIComponent(first_name).replace(/--[AB]--/g, ''));
+			updateField(
+				"first_name",
+				decodeURIComponent(first_name).replace(/--[AB]--/g, ""),
+			);
 		}
 		if (last_name) {
-			updateField('last_name', decodeURIComponent(last_name).replace(/--[AB]--/g, ''));
+			updateField(
+				"last_name",
+				decodeURIComponent(last_name).replace(/--[AB]--/g, ""),
+			);
 		}
 		if (phone_number) {
-			updateField('contact_number', decodeURIComponent(phone_number).replace(/--[AB]--/g, ''));
+			updateField(
+				"contact_number",
+				decodeURIComponent(phone_number).replace(/--[AB]--/g, ""),
+			);
 		}
 		if (user) {
 			// ViciDial agent name will be the user parameter
-			updateAgentInfo('agent_name', decodeURIComponent(user).replace(/--[AB]--/g, ''));
+			updateAgentInfo(
+				"agent_name",
+				decodeURIComponent(user).replace(/--[AB]--/g, ""),
+			);
 		}
 	}, [user, first_name, last_name, phone_number, updateField, updateAgentInfo]);
 

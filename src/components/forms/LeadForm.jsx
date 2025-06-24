@@ -24,7 +24,8 @@ const branchOptions = [
 	{ value: "Lenasia-Tariq", label: "Lenasia-Tariq" },
 	{ value: "Rosebank-Irshad", label: "Rosebank-Irshad" },
 	{ value: "Vereeniging-Nur", label: "Vereeniging-Nur" },
-	{ value: "Durban-Alfred", label: "Durban-Alfred" },
+	{ value: "Durban-Owen", label: "Durban-Owen" },
+	{ value: "Durban-Leon", label: "Durban-Leon" },
 	{ value: "East-Rand-Johan", label: "East Rand-Johan" },
 	{ value: "Pretoria-Tanya", label: "Pretoria-Tanya" },
 	{ value: "Rivonia-dean", label: "Rivonia-Dean" },
@@ -90,18 +91,21 @@ const LeadForm = () => {
 	const formatErrorMessage = (err) => {
 		if (err instanceof ValidationError) {
 			if (Array.isArray(err.details)) {
-				return err.details.map((detail) => {
-					const field = detail.loc[detail.loc.length - 1];
-					const fieldLabel = {
-						first_name: "First Name",
-						last_name: "Last Name",
-						email: "Email Address",
-						contact_number: "Contact Number",
-						agent_name: "Agent Name",
-						branch_name: "Office",
-					}[field] || field;
-					return `${fieldLabel}: ${detail.msg}`;
-				}).join("\n");
+				return err.details
+					.map((detail) => {
+						const field = detail.loc[detail.loc.length - 1];
+						const fieldLabel =
+							{
+								first_name: "First Name",
+								last_name: "Last Name",
+								email: "Email Address",
+								contact_number: "Contact Number",
+								agent_name: "Agent Name",
+								branch_name: "Office",
+							}[field] || field;
+						return `${fieldLabel}: ${detail.msg}`;
+					})
+					.join("\n");
 			}
 			return err.details || "Please check your input and try again.";
 		}
@@ -146,21 +150,22 @@ const LeadForm = () => {
 			const firstErrorField = Object.keys(errors)[0];
 			if (firstErrorField) {
 				const inputElement = document.querySelector(
-					`[name="${firstErrorField}"]`
+					`[name="${firstErrorField}"]`,
 				);
 				inputElement?.focus();
 
 				// Show validation error message
 				const errorMessages = Object.entries(errors)
 					.map(([field, message]) => {
-						const fieldLabel = {
-							first_name: "First Name",
-							last_name: "Last Name",
-							email: "Email Address",
-							contact_number: "Contact Number",
-							agent_name: "Agent Name",
-							branch_name: "Office",
-						}[field] || field;
+						const fieldLabel =
+							{
+								first_name: "First Name",
+								last_name: "Last Name",
+								email: "Email Address",
+								contact_number: "Contact Number",
+								agent_name: "Agent Name",
+								branch_name: "Office",
+							}[field] || field;
 						return `${fieldLabel}: ${message}`;
 					})
 					.join("\n");
@@ -189,7 +194,8 @@ const LeadForm = () => {
 
 			if (customer_info.id_number) {
 				const trimmedIdNumber = customer_info.id_number.trim();
-				if (trimmedIdNumber.length > 0) customerInfo.id_number = trimmedIdNumber;
+				if (trimmedIdNumber.length > 0)
+					customerInfo.id_number = trimmedIdNumber;
 			}
 
 			const payload = {
@@ -364,9 +370,7 @@ const LeadForm = () => {
 						<div className="alert-content">
 							<AlertCircle className="alert-icon" size={20} />
 							<div className="alert-message-container">
-								<p className="alert-message">
-									{error.message || error}
-								</p>
+								<p className="alert-message">{error.message || error}</p>
 								{error.action && (
 									<button
 										type="button"
@@ -381,7 +385,6 @@ const LeadForm = () => {
 					</motion.div>
 				)}
 			</AnimatePresence>
-
 			<div className="form-footer">
 				<Button
 					type="submit"
