@@ -18,17 +18,18 @@ import "@styles/LeadForm.css";
 
 const branchOptions = [
 	{ value: "", label: "Select Office..." },
-	{ value: "Lenasia-HeadOffice", label: "Lenasia-HO" },
-	{ value: "Lenasia-Riaad", label: "Lenasia-Riaad" },
-	{ value: "Lenasia-Ziyaad", label: "Lenasia-Ziyaad" },
-	{ value: "Lenasia-Tariq", label: "Lenasia-Tariq" },
-	{ value: "Rosebank-Irshad", label: "Rosebank-Irshad" },
-	{ value: "Vereeniging-Nur", label: "Vereeniging-Nur" },
-	{ value: "KZN-Owen", label: "KZN-Owen" },
-	{ value: "KZN-Leon", label: "KZN-Leon" },
-	{ value: "East-Rand-Johan", label: "East Rand-Johan" },
-	{ value: "Pretoria-Tanya", label: "Pretoria-Tanya" },
-	{ value: "Rivonia-dean", label: "Rivonia-Dean" },
+	{ value: "Lenasia-HeadOffice", label: "Lenasia HeadOffice" },
+	{ value: "Lenasia-Riaad", label: "Lenasia Riaad" },
+	{ value: "Lenasia-Ziyaad", label: "Lenasia Ziyaad" },
+	{ value: "Lenasia-Tariq", label: "Lenasia Tariq" },
+	{ value: "Rosebank-Irshad", label: "Rosebank Irshad" },
+	{ value: "Vereeniging-Nur", label: "Vereeniging Nur" },
+	{ value: "KZN-Owen", label: "KZN Owen" },
+	{ value: "KZN-Leon", label: "KZN Leon" },
+	{ value: "East-Rand-Johan", label: "East-Rand Johan" },
+	{ value: "Pretoria-Tanya", label: "Pretoria Tanya" },
+	{ value: "Rivonia-dean", label: "Rivonia Dean" },
+	{ value: "Cape-Town-Nur", label: "Cape-Town Nur"}
 
 	// Remove the empty object
 	// Add more branches as needed
