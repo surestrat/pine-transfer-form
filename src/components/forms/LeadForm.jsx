@@ -29,7 +29,7 @@ const branchOptions = [
 	{ value: "East-Rand-Johan", label: "East-Rand Johan" },
 	{ value: "Pretoria-Tanya", label: "Pretoria Tanya" },
 	{ value: "Rivonia-dean", label: "Rivonia Dean" },
-	{ value: "Cape-Town-Nur", label: "Cape-Town Nur"}
+	{ value: "Cape-Town-Nur", label: "Cape-Town Nur" },
 
 	// Remove the empty object
 	// Add more branches as needed
