@@ -1,22 +1,12 @@
 services:
   # Production service
   pine-transfer-form:
-    build: 
-      context: .
-      args:
-        - VITE_API_URL=${VITE_API_URL:-https://webform.surestrat.xyz}
-        - VITE_PINE_API_URL=${VITE_PINE_API_URL:-https://webform.surestrat.xyz/api/v1/transfer}
-        - VITE_QUOTE_API_URL=${VITE_QUOTE_API_URL:-https://webform.surestrat.xyz/api/v1/quote}
+    build: .
     container_name: pine-transfer-form
     ports:
-      - "${PORT:-3573}:3000"
+      - "3000:3000"
     environment:
       - NODE_ENV=production
-      - VITE_API_URL=${VITE_API_URL:-https://webform.surestrat.xyz}
-      - VITE_PINE_API_URL=${VITE_PINE_API_URL:-https://webform.surestrat.xyz/api/v1/transfer}
-      - VITE_QUOTE_API_URL=${VITE_QUOTE_API_URL:-https://webform.surestrat.xyz/api/v1/quote}
-    env_file:
-      - .env
     networks:
       - pine-network
     restart: unless-stopped
