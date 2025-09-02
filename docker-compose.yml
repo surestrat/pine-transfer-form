@@ -1,28 +1,9 @@
 services:
-  # Production service
   pine-transfer-form:
-    build: 
+    build:
       context: .
-      # Add build-time memory limits
-      shm_size: '2gb'
+      dockerfile: Dockerfile
     container_name: pine-transfer-form
     ports:
-      - "3573:3000"
-    environment:
-      - NODE_ENV=production
-    # Add runtime memory limits
-    mem_limit: 1g
-    memswap_limit: 2g
-    networks:
-      - pine-network
+      - "3000:3000"
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-networks:
-  pine-network:
-    driver: bridge
