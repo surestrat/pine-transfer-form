@@ -2,7 +2,9 @@ import axios from 'axios';
 
 // Get the API URL from environment variables
 const API_URL =
-    import.meta.env.VITE_PINE_API_URL || "https://api.surestrat.xyz/api/v1/transfer";
+    import.meta.env.VITE_PINE_API_URL || 
+    import.meta.env.VITE_API_URL + "/transfer" || 
+    "https://api.surestrat.xyz/api/v1/transfer";
 console.log("[apiService] Using API_URL:", API_URL);
 
 // Axios instance with retry configuration
@@ -16,7 +18,7 @@ const axiosInstance = axios.create({
 
 // Add retry logic
 axiosInstance.interceptors.response.use(undefined, async (err) => {
-    const { config, message } = err;
+    const { config } = err;
     if (!config || !config.retry) {
         return Promise.reject(err);
     }
