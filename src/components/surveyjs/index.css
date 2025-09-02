@@ -1,0 +1,169 @@
+/* SurveyJS custom styles to match the app theme */
+.sv-string-viewer {
+    color: var(--sjs-general-forecolor) !important;
+}
+
+.sv-root-modern {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* Progress bar styling */
+.sv-progress {
+    background: rgba(45, 212, 191, 0.2) !important;
+}
+
+.sv-progress__bar {
+    background: #2dd4bf !important;
+}
+
+/* Button styling to match app theme */
+.sv-btn {
+    transition: all 0.2s ease-in-out;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.sv-btn--primary {
+    background: #2dd4bf !important;
+    border-color: #2dd4bf !important;
+    color: #0a0c10 !important;
+}
+
+.sv-btn--primary:hover {
+    background: #14b8a6 !important;
+    border-color: #14b8a6 !important;
+    transform: translateY(-1px);
+}
+
+.sv-btn--secondary {
+    background: transparent !important;
+    border-color: #374151 !important;
+    color: #d1d5db !important;
+}
+
+.sv-btn--secondary:hover {
+    background: #374151 !important;
+    border-color: #4b5563 !important;
+}
+
+/* Input field styling */
+.sv-text {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+    border-radius: 6px;
+}
+
+.sv-text:focus {
+    border-color: #2dd4bf !important;
+    box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.2) !important;
+}
+
+/* Dropdown styling */
+.sv-dropdown {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+    border-radius: 6px;
+}
+
+/* Panel styling */
+.sv-panel {
+    background: rgba(31, 41, 55, 0.5) !important;
+    border: 1px solid #374151 !important;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.sv-panel__title {
+    color: #2dd4bf !important;
+    font-weight: 600;
+}
+
+/* Question styling */
+.sv-question__title {
+    color: #f3f4f6 !important;
+    font-weight: 500;
+}
+
+.sv-question__description {
+    color: #9ca3af !important;
+}
+
+/* Error styling */
+.sv-question--error .sv-text {
+    border-color: #ef4444 !important;
+}
+
+.sv-question__errs {
+    color: #fca5a5 !important;
+}
+
+/* Page styling */
+.sv-page {
+    background: transparent !important;
+}
+
+.sv-page__title {
+    color: #f3f4f6 !important;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.sv-page__description {
+    color: #9ca3af !important;
+    margin-bottom: 2rem;
+}
+
+/* Dynamic panel styling */
+.sv-paneldynamic__add-btn {
+    background: rgba(45, 212, 191, 0.1) !important;
+    border-color: #2dd4bf !important;
+    color: #2dd4bf !important;
+}
+
+.sv-paneldynamic__remove-btn {
+    background: rgba(239, 68, 68, 0.1) !important;
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+}
+
+/* Boolean/checkbox styling */
+.sv-boolean {
+    color: #f3f4f6 !important;
+}
+
+.sv-boolean__switch {
+    background: #374151 !important;
+}
+
+.sv-boolean--checked .sv-boolean__switch {
+    background: #2dd4bf !important;
+}
+
+/* Radio button styling */
+.sv-radiogroup__item {
+    color: #f3f4f6 !important;
+}
+
+.sv-radiogroup__control {
+    border-color: #374151 !important;
+}
+
+.sv-radiogroup__control--checked {
+    border-color: #2dd4bf !important;
+    background: #2dd4bf !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sv-panel {
+        margin-bottom: 1rem;
+        padding: 1rem;
+    }
+    
+    .sv-page__title {
+        font-size: 1.25rem;
+    }
+}

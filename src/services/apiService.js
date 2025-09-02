@@ -1,8 +1,9 @@
-import axios from "axios";
+import axios from 'axios';
 
 // Get the API URL from environment variables
 const API_URL =
-	import.meta.env.VITE_PINE_API_URL || "https://api.surestrat.xyz/api/v1/transfer";
+    import.meta.env.VITE_PINE_API_URL || "https://api.surestrat.xyz/api/v1/transfer";
+console.log("[apiService] Using API_URL:", API_URL);
 
 // Axios instance with retry configuration
 const axiosInstance = axios.create({
@@ -56,6 +57,7 @@ class ValidationError extends Error {
 
 export const submitForm = async (payload) => {
     try {
+        console.log("[apiService] submitForm called with payload:", payload);
         // Format the customer info
         const customerInfo = {
             source: "SureStrat",
@@ -70,9 +72,7 @@ export const submitForm = async (payload) => {
             const trimmedQuoteId = payload.quote_id.trim();
             if (trimmedQuoteId.length > 0) customerInfo.quote_id = trimmedQuoteId;
         }
-        
 
-        
         if (payload.id_number) {
             const trimmedIdNumber = payload.id_number.trim();
             if (trimmedIdNumber.length > 0) customerInfo.id_number = trimmedIdNumber;
@@ -82,10 +82,13 @@ export const submitForm = async (payload) => {
         const formattedPayload = {
             customer_info: customerInfo,
             agent_info: {
-                agent_name: payload.agent_name,
+                agent_email: payload.agent_email.trim(),
                 branch_name: payload.branch_name,
             }
         };
+
+        console.log("[apiService] Posting to API_URL:", API_URL);
+        console.log("[apiService] Formatted payload:", formattedPayload);
 
         // Add request timeout handling
         const timeoutDuration = 30000; // 30 seconds
@@ -101,13 +104,15 @@ export const submitForm = async (payload) => {
             headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
-                "X-Request-ID": new Date().getTime() // Add request tracking
+                "X-Request-ID": Date.now() // Add request tracking
             }
         });
 
         const response = await Promise.race([fetchPromise, timeoutPromise]);
+        console.log("[apiService] API response:", response);
         return response.data;
     } catch (error) {
+        console.error("[apiService] Error during submitForm:", error);
         // Network errors
         if (!error.response) {
             throw new NetworkError(

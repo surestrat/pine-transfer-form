@@ -1,9 +1,16 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { motion } from "framer-motion";
-import FormPage from "@pages/FormPage";
-import SuccessPage from "@pages/SuccessPage";
-import { GradientBackground } from "@components/ui/GradientBackground";
-import ErrorBoundary from "@components/ErrorBoundary"; // Import ErrorBoundary
+import { motion } from 'framer-motion';
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+} from 'react-router-dom';
+
+import ErrorBoundary from '@components/ErrorBoundary'; // Import ErrorBoundary
+import { GradientBackground } from '@components/ui/GradientBackground';
+import FormPage from '@pages/FormPage';
+import QuotePage from '@pages/QuotePage';
+import SuccessPage from '@pages/SuccessPage';
+import WaitingPage from '@pages/WaitingPage';
 
 function App() {
 	return (
@@ -33,6 +40,8 @@ function App() {
 								element={<FormPage />}
 							/>
 							<Route path="/success" element={<SuccessPage />} />
+							<Route path="/quote" element={<QuotePage />} />
+							<Route path="/waiting" element={<WaitingPage />} />
 							{/* Add a fallback route if needed */}
 							{/* <Route path="*" element={<NotFoundPage />} /> */}
 						</Routes>

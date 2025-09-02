@@ -1,11 +1,17 @@
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { Lock } from "lucide-react";
-import { useParams } from "react-router-dom";
-import LeadForm from "@components/forms/LeadForm.jsx";
-import Logo from "@components/ui/Logo";
-import { useFormStore } from "@store/formStore";
-import "@styles/FormPage.css";
+import '@styles/FormPage.css';
+
+import {
+  useEffect,
+  useState,
+} from 'react';
+
+import { motion } from 'framer-motion';
+import { Lock } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+
+import LeadForm from '@components/forms/LeadForm.jsx';
+import Logo from '@components/ui/Logo';
+import { useFormStore } from '@store/formStore';
 
 const FormPage = () => {
 	const { user, first_name, last_name, phone_number } = useParams();
@@ -35,7 +41,7 @@ const FormPage = () => {
 		if (user) {
 			// ViciDial agent name will be the user parameter
 			updateAgentInfo(
-				"agent_name",
+				"agent_email",
 				decodeURIComponent(user).replace(/--[AB]--/g, ""),
 			);
 		}

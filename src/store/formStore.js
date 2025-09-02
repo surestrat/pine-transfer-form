@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { z } from "zod";
+import { z } from 'zod';
+import { create } from 'zustand';
 
 const formSchema = z.object({
 	first_name: z.string().min(2, "First name must be at least 2 characters"),
@@ -11,7 +11,7 @@ const formSchema = z.object({
 });
 
 const agentSchema = z.object({
-	agent_name: z.string().min(2, "Agent name must be at least 2 characters"),
+	agent_email: z.string().email("Invalid email format").min(1, "Email is required"),
 	branch_name: z.string().min(2, "Office name must be at least 2 characters"),
 });
 
@@ -25,7 +25,7 @@ const initialFormData = {
 };
 
 const initialAgentInfo = {
-	agent_name: "",
+	agent_email: "",
 	branch_name: "",
 };
 

@@ -1,21 +1,40 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { AlertCircle, Check } from "lucide-react";
-import "@styles/InputField.css";
+import '@styles/InputField.css';
+
+import React, {
+  useEffect,
+  useId,
+  useState,
+} from 'react';
+
+import {
+  AnimatePresence,
+  motion,
+} from 'framer-motion';
+import {
+  AlertCircle,
+  Check,
+} from 'lucide-react';
 
 export const InputField = ({
-	label,
-	name,
-	value,
-	onChange,
-	error,
-	type = "text",
-	required = false,
-	pattern,
-	placeholder,
-	icon: Icon,
-	optional = false,
+ label,
+ name,
+ value,
+ onChange,
+ error,
+ type = "text",
+ required = false,
+ pattern,
+ placeholder,
+ icon: Icon,
+ optional = false,
+ id: idProp,
 }) => {
+ const reactId = useId();
+ const id = idProp || `${name}-${reactId}`;
+ const errorId = `${id}-error`;
+
+ // Always use a string for value to avoid controlled/uncontrolled warning
+ const safeValue = value === undefined || value === null ? "" : value;
 	const [focused, setFocused] = useState(false);
 	const [touched, setTouched] = useState(false);
 	const [isOldBrowser, setIsOldBrowser] = useState(false);
@@ -62,25 +81,25 @@ export const InputField = ({
 		.filter(Boolean)
 		.join(" ");
 
-	return (
-		<div className="input-field-container">
-			<label htmlFor={name} className="input-label">
-				{label} {required && <span className="input-label-required">*</span>}
-			</label>
-			<div className="input-wrapper">
-				{/* Icon positioned absolutely on the left */}
-				{hasIcon && (
-					<div className="input-icon-left">
-						<Icon className={iconClassName} />
-					</div>
-				)}{" "}
-				{isOldBrowser ? (
+	 return (
+		 <div className="input-field-container">
+			 <label htmlFor={id} className="input-label">
+				 {label} {required && <span className="input-label-required">*</span>}
+			 </label>
+			 <div className="input-wrapper">
+				 {/* Icon positioned absolutely on the left */}
+				 {hasIcon && (
+					 <div className="input-icon-left">
+						 <Icon className={iconClassName} />
+					 </div>
+				 )}
+				 {isOldBrowser ? (
 					// Regular input for older browsers
 					<input
-						id={name}
+						id={id}
 						name={name}
 						type={type}
-						value={value}
+						value={safeValue}
 						onChange={onChange}
 						onFocus={() => setFocused(true)}
 						onBlur={handleBlur}
@@ -88,16 +107,16 @@ export const InputField = ({
 						pattern={pattern}
 						placeholder={placeholder || `Enter ${label.toLowerCase()}...`}
 						aria-invalid={!!error}
-						aria-describedby={error ? `${name}-error` : undefined}
+						aria-describedby={error ? errorId : undefined}
 						className={inputClassName}
 					/>
-				) : (
+				 ) : (
 					// Motion input for modern browsers
 					<motion.input
-						id={name}
+						id={id}
 						name={name}
 						type={type}
-						value={value}
+						value={safeValue}
 						onChange={onChange}
 						onFocus={() => setFocused(true)}
 						onBlur={handleBlur}
@@ -105,39 +124,39 @@ export const InputField = ({
 						pattern={pattern}
 						placeholder={placeholder || `Enter ${label.toLowerCase()}...`}
 						aria-invalid={!!error}
-						aria-describedby={error ? `${name}-error` : undefined}
+						aria-describedby={error ? errorId : undefined}
 						className={inputClassName}
 						whileFocus={{ scale: 1.01 }}
 					/>
-				)}
-				{/* Validation Icons positioned absolutely on the right */}
-				<div className="input-validation-icon">
-					{isValid && <Check className="input-valid-icon" />}
-					{error && touched && <AlertCircle className="input-error-icon" />}
-				</div>
-			</div>
+				 )}
+				 {/* Validation Icons positioned absolutely on the right */}
+				 <div className="input-validation-icon">
+					 {isValid && <Check className="input-valid-icon" />}
+					 {error && touched && <AlertCircle className="input-error-icon" />}
+				 </div>
+			 </div>
 
-			{/* Error message - conditional rendering based on browser */}
-			{error &&
-				touched &&
-				(isOldBrowser ? (
-					<p id={`${name}-error`} className="input-error-message" role="alert">
-						{error}
-					</p>
-				) : (
-					<AnimatePresence>
-						<motion.p
-							id={`${name}-error`}
-							initial={{ opacity: 0, y: -5 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: -5 }}
-							className="input-error-message"
-							role="alert"
-						>
-							{error}
-						</motion.p>
-					</AnimatePresence>
-				))}
-		</div>
-	);
+			 {/* Error message - conditional rendering based on browser */}
+			 {error &&
+				 touched &&
+				 (isOldBrowser ? (
+					 <p id={errorId} className="input-error-message" role="alert">
+						 {error}
+					 </p>
+				 ) : (
+					 <AnimatePresence>
+						 <motion.p
+							 id={errorId}
+							 initial={{ opacity: 0, y: -5 }}
+							 animate={{ opacity: 1, y: 0 }}
+							 exit={{ opacity: 0, y: -5 }}
+							 className="input-error-message"
+							 role="alert"
+						 >
+							 {error}
+						 </motion.p>
+					 </AnimatePresence>
+				 ))}
+		 </div>
+	 );
 };

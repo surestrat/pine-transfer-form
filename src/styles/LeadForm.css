@@ -166,9 +166,45 @@
 	padding-top: 1.5rem; /* pt-6 */
 }
 
+.button-group {
+	display: flex;
+	gap: 1rem;
+	flex-direction: column;
+	width: 100%;
+}
+
+@media (min-width: 640px) {
+	.button-group {
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+	}
+}
+
 .submit-button {
 	width: 100%; /* w-full */
 	min-width: 180px; /* min-w-[180px] */
+	flex: 1;
+}
+
+.quote-button {
+	width: 100%;
+	min-width: 180px;
+	flex: 1;
+}
+
+@media (min-width: 640px) {
+	.submit-button {
+		flex: 0 0 auto;
+		min-width: 200px;
+		width: auto;
+	}
+	
+	.quote-button {
+		flex: 0 0 auto;
+		min-width: 200px;
+		width: auto;
+	}
 }
 
 .loading-icon {

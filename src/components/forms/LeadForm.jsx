@@ -1,20 +1,32 @@
-import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import '@styles/LeadForm.css';
+
+import React, {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react';
+
 import {
-	Check,
-	AlertCircle,
-	Loader2,
-	User,
-	Phone,
-	FileText,
-	Mail,
-} from "lucide-react";
-import { useFormStore } from "@store/formStore";
-import { InputField } from "@components/ui/InputField";
-import { Button } from "@components/ui/Button";
-import { submitForm } from "@services/apiService";
-import "@styles/LeadForm.css";
+  AnimatePresence,
+  motion,
+} from 'framer-motion';
+import {
+  AlertCircle,
+  Check,
+  FileText,
+  Loader2,
+  Mail,
+  Phone,
+  User,
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+import ErrorBoundary from '@components/ErrorBoundary';
+import { Button } from '@components/ui/Button';
+import { InputField } from '@components/ui/InputField';
+import { submitForm } from '@services/apiService';
+import { useFormStore } from '@store/formStore';
 
 const branchOptions = [
 	{ value: "", label: "Select Office..." },
@@ -36,6 +48,14 @@ const branchOptions = [
 ];
 
 const LeadForm = () => {
+		const firstNameId = useId();
+		const lastNameId = useId();
+		const emailId = useId();
+		const idNumberId = useId();
+		const contactNumberId = useId();
+		const agentEmailId = useId();
+		const branchNameId = useId();
+		const quoteIdId = useId();
 	const navigate = useNavigate();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState(null);
@@ -90,28 +110,29 @@ const LeadForm = () => {
 	};
 
 	const formatErrorMessage = (err) => {
-		if (err instanceof ValidationError) {
-			if (Array.isArray(err.details)) {
-				return err.details
-					.map((detail) => {
-						const field = detail.loc[detail.loc.length - 1];
-						const fieldLabel =
-							{
-								first_name: "First Name",
-								last_name: "Last Name",
-								email: "Email Address",
-								contact_number: "Contact Number",
-								agent_name: "Agent Name",
-								branch_name: "Office",
-							}[field] || field;
-						return `${fieldLabel}: ${detail.msg}`;
-					})
-					.join("\n");
-			}
-			return err.details || "Please check your input and try again.";
+		// If Zod validation error
+		if (err?.errors && Array.isArray(err.errors)) {
+			return err.errors
+				.map((detail) => {
+					const field = detail.path?.[detail.path.length - 1];
+					const fieldLabel =
+						{
+							first_name: "First Name",
+							last_name: "Last Name",
+							email: "Email Address",
+							contact_number: "Contact Number",
+							id_number: "ID Number",
+							quote_id: "Quote ID",
+							agent_email: "Agent Email",
+							branch_name: "Office",
+						}[field] || field;
+					return `${fieldLabel}: ${detail.message}`;
+				})
+				.join("\n");
 		}
 
-		if (err instanceof NetworkError) {
+		// Network error (axios or fetch)
+		if (err?.isAxiosError) {
 			return {
 				message: err.message,
 				action: "Retry",
@@ -119,7 +140,8 @@ const LeadForm = () => {
 			};
 		}
 
-		if (err instanceof ApiError) {
+		// API error with status
+		if (err && typeof err.status === "number") {
 			switch (err.status) {
 				case 429:
 					submitTimeoutRef.current = setTimeout(() => {
@@ -137,7 +159,8 @@ const LeadForm = () => {
 			}
 		}
 
-		return "An unexpected error occurred. Please try again.";
+		// Fallback
+		return err?.message || "An unexpected error occurred. Please try again.";
 	};
 
 	const handleSubmit = async (e) => {
@@ -146,7 +169,12 @@ const LeadForm = () => {
 		}
 		setError(null);
 
+		console.log("[LeadForm] Submitting form...");
+		console.log("[LeadForm] customer_info:", customer_info);
+		console.log("[LeadForm] agent_info:", agent_info);
+
 		const isValid = validateForm();
+		console.log("[LeadForm] validateForm result:", isValid, errors);
 		if (!isValid) {
 			const firstErrorField = Object.keys(errors)[0];
 			if (firstErrorField) {
@@ -164,13 +192,16 @@ const LeadForm = () => {
 								last_name: "Last Name",
 								email: "Email Address",
 								contact_number: "Contact Number",
-								agent_name: "Agent Name",
+								id_number: "ID Number",
+								quote_id: "Quote ID",
+								agent_email: "Agent Email",
 								branch_name: "Office",
 							}[field] || field;
 						return `${fieldLabel}: ${message}`;
 					})
 					.join("\n");
 				setError(errorMessages);
+				console.warn("[LeadForm] Validation failed:", errorMessages);
 			}
 			return;
 		}
@@ -201,15 +232,18 @@ const LeadForm = () => {
 
 			const payload = {
 				...customerInfo,
-				agent_name: agent_info.agent_name,
+				agent_email: agent_info.agent_email,
 				branch_name: agent_info.branch_name,
 			};
 
+			console.log("[LeadForm] Submitting payload to API:", payload);
 			const apiResponse = await submitForm(payload);
+			console.log("[LeadForm] API response:", apiResponse);
 
 			setApiResponse(apiResponse);
 			navigate("/success");
 		} catch (err) {
+			console.error("[LeadForm] Submission error:", err);
 			const errorInfo = formatErrorMessage(err);
 			if (typeof errorInfo === "object") {
 				setError(errorInfo);
@@ -234,30 +268,32 @@ const LeadForm = () => {
 					animate={{ x: 0, opacity: 1 }}
 					transition={{ delay: 0.1 }}
 				>
-					<InputField
-						label="First Name"
-						name="first_name"
-						value={customer_info.first_name}
-						onChange={handleChange}
-						error={errors.first_name}
-						required
-						icon={User}
-					/>
+					 <InputField
+						 label="First Name"
+						 name="first_name"
+						 id={`first_name-${firstNameId}`}
+						 value={customer_info.first_name}
+						 onChange={handleChange}
+						 error={errors.first_name}
+						 required
+						 icon={User}
+					 />
 				</motion.div>
 				<motion.div
 					initial={{ x: 10, opacity: 0 }}
 					animate={{ x: 0, opacity: 1 }}
 					transition={{ delay: 0.15 }}
 				>
-					<InputField
-						label="Last Name"
-						name="last_name"
-						value={customer_info.last_name}
-						onChange={handleChange}
-						error={errors.last_name}
-						required
-						icon={User}
-					/>
+					 <InputField
+						 label="Last Name"
+						 name="last_name"
+						 id={`last_name-${lastNameId}`}
+						 value={customer_info.last_name}
+						 onChange={handleChange}
+						 error={errors.last_name}
+						 required
+						 icon={User}
+					 />
 				</motion.div>
 			</div>{" "}
 			<motion.div
@@ -266,48 +302,69 @@ const LeadForm = () => {
 				transition={{ delay: 0.2 }}
 			>
 				{" "}
-				<InputField
-					label="Email Address"
-					name="email"
-					type="email"
-					value={customer_info.email || ""}
-					onChange={handleChange}
-					error={errors.email}
-					icon={Mail}
-					required={true}
-				/>
+				 <InputField
+					 label="Email Address"
+					 name="email"
+					 id={`email-${emailId}`}
+					 type="email"
+					 value={customer_info.email || ""}
+					 onChange={handleChange}
+					 error={errors.email}
+					 icon={Mail}
+					 required={true}
+				 />
 			</motion.div>{" "}
 			<motion.div
 				initial={{ y: 10, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ delay: 0.25 }}
 			>
-				<InputField
-					label="ID Number (Optional)"
-					name="id_number"
-					value={customer_info.id_number || ""}
-					onChange={handleChange}
-					error={errors.id_number}
-					icon={FileText}
-					optional={true}
-					required={false}
-				/>
+				 <InputField
+					 label="ID Number (Optional)"
+					 name="id_number"
+					 id={`id_number-${idNumberId}`}
+					 value={customer_info.id_number || ""}
+					 onChange={handleChange}
+					 error={errors.id_number}
+					 icon={FileText}
+					 optional={true}
+					 required={false}
+				 />
 			</motion.div>
 			<motion.div
 				initial={{ y: 10, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
-				transition={{ delay: 0.35 }}
+				transition={{ delay: 0.3 }}
 			>
-				<InputField
-					label="Contact Number"
-					name="contact_number"
-					type="tel"
-					value={customer_info.contact_number}
-					onChange={handleChange}
-					error={errors.contact_number}
-					required
-					icon={Phone}
-				/>
+				 <InputField
+					 label="Quote ID (Optional)"
+					 name="quote_id"
+					 id={`quote_id-${quoteIdId}`}
+					 value={customer_info.quote_id || ""}
+					 onChange={handleChange}
+					 error={errors.quote_id}
+					 icon={FileText}
+					 optional={true}
+					 required={false}
+					 placeholder="Enter your quote reference ID"
+				 />
+			</motion.div>
+			<motion.div
+				initial={{ y: 10, opacity: 0 }}
+				animate={{ y: 0, opacity: 1 }}
+				transition={{ delay: 0.4 }}
+			>
+				 <InputField
+					 label="Contact Number"
+					 name="contact_number"
+					 id={`contact_number-${contactNumberId}`}
+					 type="tel"
+					 value={customer_info.contact_number}
+					 onChange={handleChange}
+					 error={errors.contact_number}
+					 required
+					 icon={Phone}
+				 />
 			</motion.div>{" "}
 			<div className="divider-section">
 				<h2 className="section-title">
@@ -317,44 +374,45 @@ const LeadForm = () => {
 					Agent Information
 				</h2>
 				<div className="form-grid">
-					<InputField
-						label="Agent Name"
-						name="agent_name"
-						value={agent_info.agent_name}
-						onChange={handleAgentChange}
-						error={errors.agent_name}
-						required
-						icon={User}
-					/>{" "}
+					 <InputField
+						 label="Agent Email"
+						 name="agent_email"
+						 id={`agent_email-${agentEmailId}`}
+						 value={agent_info.agent_email}
+						 onChange={handleAgentChange}
+						 error={errors.agent_email}
+						 required
+						 icon={User}
+					 />{" "}
 					<div className="form-group">
-						<label htmlFor="branch_name" className="form-label">
-							Office <span className="required-mark">*</span>
-						</label>
-						<div className="select-wrapper">
-							<select
-								id="branch_name"
-								name="branch_name"
-								value={agent_info.branch_name}
-								onChange={handleAgentChange}
-								required
-								className={`form-select ${errors.branch_name ? "error" : ""}`}
-								aria-invalid={!!errors.branch_name}
-								aria-describedby={
-									errors.branch_name ? "branch-error" : undefined
-								}
-							>
-								{branchOptions.map((option) => (
-									<option key={option.value} value={option.value}>
-										{option.label}
-									</option>
-								))}
-							</select>
-						</div>{" "}
-						{errors.branch_name && (
-							<p id="branch-error" className="error-message" role="alert">
-								{errors.branch_name}
-							</p>
-						)}
+									<label htmlFor={`branch_name-${branchNameId}`} className="form-label">
+										Office <span className="required-mark">*</span>
+									</label>
+									<div className="select-wrapper">
+										<select
+											id={`branch_name-${branchNameId}`}
+											name="branch_name"
+											value={agent_info.branch_name}
+											onChange={handleAgentChange}
+											required
+											className={`form-select ${errors.branch_name ? "error" : ""}`}
+											aria-invalid={!!errors.branch_name}
+											aria-describedby={
+												errors.branch_name ? `branch-error-${branchNameId}` : undefined
+											}
+										>
+											{branchOptions.map((option) => (
+												<option key={option.value} value={option.value}>
+													{option.label}
+												</option>
+											))}
+										</select>
+									</div>{" "}
+									{errors.branch_name && (
+										<p id={`branch-error-${branchNameId}`} className="error-message" role="alert">
+											{errors.branch_name}
+										</p>
+									)}
 					</div>
 				</div>
 			</div>
@@ -387,26 +445,47 @@ const LeadForm = () => {
 				)}
 			</AnimatePresence>
 			<div className="form-footer">
-				<Button
-					type="submit"
-					variant="primary"
-					disabled={isSubmitting}
-					className="submit-button"
-				>
-					{isSubmitting ? (
-						<>
-							<Loader2 className="loading-icon" />
-							{retryAttempts > 0
-								? `Retrying... (${retryAttempts}/${maxRetries})`
-								: "Submitting..."}
-						</>
-					) : (
-						<>
-							Submit Application
-							<Check className="check-icon" />
-						</>
-					)}
-				</Button>
+				<ErrorBoundary fallback={
+					<div className="alert-box" role="alert" style={{marginTop: 16}}>
+						<div className="alert-content">
+							<AlertCircle className="alert-icon" size={20} />
+							<div className="alert-message-container">
+								<p className="alert-message">A critical error occurred with the submit button. Please refresh the page or contact support.</p>
+							</div>
+						</div>
+					</div>
+				}>
+					<div className="button-group">
+						<Button
+							type="submit"
+							variant="primary"
+							disabled={isSubmitting}
+							className="submit-button"
+						>
+							{isSubmitting ? (
+								<>
+									<Loader2 className="loading-icon" />
+									{retryAttempts > 0
+										? `Retrying... (${retryAttempts}/${maxRetries})`
+										: "Submitting..."}
+								</>
+							) : (
+								<>
+									Submit Application
+									<Check className="check-icon" />
+								</>
+							)}
+						</Button>
+						<Button
+							type="button"
+							variant="secondary"
+							onClick={() => navigate('/quote')}
+							className="quote-button"
+						>
+							Get Insurance Quote
+						</Button>
+					</div>
+				</ErrorBoundary>
 			</div>
 		</form>
 	);
