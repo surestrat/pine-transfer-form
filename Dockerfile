@@ -13,8 +13,17 @@ RUN bun install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build the application
+# Set build-time environment variables for Vite
+ARG VITE_API_URL=https://webform.surestrat.xyz
+ARG VITE_PINE_API_URL=https://webform.surestrat.xyz/api/v1/transfer
+ARG VITE_QUOTE_API_URL=https://webform.surestrat.xyz/api/v1/quote
+
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_PINE_API_URL=$VITE_PINE_API_URL
+ENV VITE_QUOTE_API_URL=$VITE_QUOTE_API_URL
 ENV NODE_ENV=production
+
+# Build the application
 RUN bun run build
 
 # Expose port (vite preview runs on 3000 with our start script)

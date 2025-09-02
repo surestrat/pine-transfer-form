@@ -32,7 +32,16 @@ export default defineConfig({
 		}
 	],
 	build: {
-		sourcemap: true, // Enable source maps for better debugging
+		sourcemap: false, // Disable source maps in production to avoid errors
+		minify: 'terser', // Use terser for better minification
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					vendor: ['react', 'react-dom'],
+					axios: ['axios']
+				}
+			}
+		}
 	},
 	resolve: {
 		alias: {

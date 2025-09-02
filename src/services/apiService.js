@@ -3,8 +3,8 @@ import axios from 'axios';
 // Get the API URL from environment variables
 const API_URL = 
     import.meta.env.VITE_PINE_API_URL || 
-    (import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/transfer` : null) || 
-    "https://api.surestrat.xyz/api/v1/transfer";
+    (import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/v1/transfer` : null) || 
+    "https://webform.surestrat.xyz/api/v1/transfer";
 
 console.log("[apiService] Environment check:");
 console.log("- VITE_API_URL:", import.meta.env.VITE_API_URL);

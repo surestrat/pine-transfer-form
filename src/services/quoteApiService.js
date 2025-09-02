@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Get the API URL for quotes
-const QUOTE_API_URL = import.meta.env.VITE_QUOTE_API_URL || "http://localhost:4000/api/v1/quote";
+const QUOTE_API_URL = import.meta.env.VITE_QUOTE_API_URL || "https://webform.surestrat.xyz/api/v1/quote";
 
 console.log("[quoteApiService] Using QUOTE_API_URL:", QUOTE_API_URL);
 
