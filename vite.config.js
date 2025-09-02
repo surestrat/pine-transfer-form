@@ -31,10 +31,13 @@ export default defineConfig({
 			}
 		}
 	],
-	define: {
-		'process.env': {
-			VITE_API_URL: JSON.stringify(process.env.VITE_API_URL || 'https://api.surestrat.xyz/api/v1')
-		}
+	// Remove the define section that was causing issues
+	build: {
+		sourcemap: true, // Enable source maps for better debugging
+	},
+	server: {
+		host: '0.0.0.0',
+		port: 3573,
 	},
 	resolve: {
 		alias: {

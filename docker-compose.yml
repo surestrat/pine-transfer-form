@@ -20,28 +20,6 @@ services:
       retries: 3
       start_period: 40s
 
-  # Development service
-  pine-transfer-form-dev:
-    image: oven/bun:1-alpine
-    container_name: pine-transfer-form-dev
-    working_dir: /app
-    ports:
-      - "${PORT:-4343}:5173"
-    volumes:
-      - .:/app
-      - /app/node_modules
-    environment:
-      - NODE_ENV=development
-      - VITE_API_URL=${VITE_API_URL:-https://api.surestrat.xyz/api/v1}
-    env_file:
-      - .env
-    command: sh -c "bun install && bun run dev --host 0.0.0.0"
-    networks:
-      - pine-network
-    restart: unless-stopped
-    profiles:
-      - dev
-
 networks:
   pine-network:
     driver: bridge

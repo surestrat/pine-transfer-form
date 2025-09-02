@@ -1,11 +1,15 @@
 import axios from 'axios';
 
 // Get the API URL from environment variables
-const API_URL =
+const API_URL = 
     import.meta.env.VITE_PINE_API_URL || 
-    import.meta.env.VITE_API_URL + "/transfer" || 
+    (import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/transfer` : null) || 
     "https://api.surestrat.xyz/api/v1/transfer";
-console.log("[apiService] Using API_URL:", API_URL);
+
+console.log("[apiService] Environment check:");
+console.log("- VITE_API_URL:", import.meta.env.VITE_API_URL);
+console.log("- VITE_PINE_API_URL:", import.meta.env.VITE_PINE_API_URL);
+console.log("- Using API_URL:", API_URL);
 
 // Axios instance with retry configuration
 const axiosInstance = axios.create({

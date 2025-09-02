@@ -1,7 +1,15 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import "@styles/index.css";
-import App from "./App.jsx";
+import '@styles/index.css';
+
+import { StrictMode } from 'react';
+
+import { createRoot } from 'react-dom/client';
+
+import { testEnvironmentVariables } from '@utils/env-test.js';
+
+import App from './App.jsx';
+
+// Test environment variables on startup
+testEnvironmentVariables();
 
 // Create a promise that resolves when the stylesheet is loaded
 const stylesLoaded = new Promise((resolve) => {
@@ -9,7 +17,7 @@ const stylesLoaded = new Promise((resolve) => {
 	if (styleSheets.length > 0) {
 		resolve();
 	} else {
-		const styleObserver = new MutationObserver((mutations) => {
+		const styleObserver = new MutationObserver(() => {
 			if (document.styleSheets.length > 0) {
 				resolve();
 				styleObserver.disconnect();
