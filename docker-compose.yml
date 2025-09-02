@@ -1,12 +1,18 @@
 services:
   # Production service
   pine-transfer-form:
-    build: .
+    build: 
+      context: .
+      # Add build-time memory limits
+      shm_size: '2gb'
     container_name: pine-transfer-form
     ports:
-      - "3000:3000"
+      - "3573:3000"
     environment:
       - NODE_ENV=production
+    # Add runtime memory limits
+    mem_limit: 1g
+    memswap_limit: 2g
     networks:
       - pine-network
     restart: unless-stopped

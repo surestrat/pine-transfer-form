@@ -1,10 +1,25 @@
 import '@styles/FormPage.css';
 
+import {
+  lazy,
+  Suspense,
+} from 'react';
+
 import { motion } from 'framer-motion';
 import { Lock } from 'lucide-react';
 
-import QuoteForm from '@components/surveyjs/quoteForm';
 import Logo from '@components/ui/Logo';
+
+// Lazy load the heavy Survey component
+const QuoteForm = lazy(() => import('@components/surveyjs/quoteForm'));
+
+// Loading spinner component
+const LoadingSpinner = () => (
+    <div className="flex justify-center items-center p-8">
+        <div className="border-b-2 border-blue-500 rounded-full w-8 h-8 animate-spin"></div>
+        <span className="ml-3 text-gray-600">Loading quote form...</span>
+    </div>
+);
 
 const QuotePage = () => {
     return (
@@ -44,7 +59,9 @@ const QuotePage = () => {
                 transition={{ delay: 0.3, ease: "easeOut" }}
                 style={{ maxWidth: '1200px', margin: '0 auto' }}
             >
-                <QuoteForm />
+                <Suspense fallback={<LoadingSpinner />}>
+                    <QuoteForm />
+                </Suspense>
             </motion.div>
         </div>
     );
