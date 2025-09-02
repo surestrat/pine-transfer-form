@@ -1,0 +1,165 @@
+# Dependencies
+node_modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Production build artifacts
+dist
+build
+.next
+.nuxt
+.output
+.vercel
+
+# Environment files - NEVER include in Docker images
+.env
+.env.*
+!.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Credentials and secrets
+.npmrc
+.yarnrc
+.yarnrc.yml
+auth.json
+.netrc
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+.vs/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+.hg/
+.svn/
+
+# Docker files (don't include Docker files in the image)
+Dockerfile*
+docker-compose*
+.dockerignore
+*.dockerfile
+
+# CI/CD and deployment
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+azure-pipelines.yml
+buildspec.yml
+.aws/
+.terraform/
+
+# Documentation and non-essential files
+README*.md
+CHANGELOG*.md
+LICENSE*
+CONTRIBUTING*.md
+docs/
+documentation/
+*.md
+!README.md
+
+# Test files and coverage
+test/
+tests/
+__tests__/
+coverage/
+.nyc_output/
+.coverage
+junit.xml
+test-results/
+.jest/
+
+# Logs and runtime data
+logs/
+*.log
+pids/
+*.pid
+*.seed
+*.pid.lock
+lib-cov/
+
+# Cache directories
+.cache/
+.parcel-cache/
+.npm/
+.yarn/cache/
+.pnpm-store/
+.eslintcache
+.stylelintcache
+
+# Temporary directories and files
+tmp/
+temp/
+.tmp/
+.temp/
+*.tmp
+*.temp
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.pnp.js
+.pnp.cjs
+
+# Editor and development tools
+.history/
+.vscode-test/
+.sass-cache/
+.connect.lock
+.directory
+
+# Storybook
+.storybook-out/
+.out/
+storybook-static/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Dependency directories (redundant but explicit)
+jspm_packages/
+
+# Backup files
+*.backup
+*.bak
+*.orig

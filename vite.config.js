@@ -1,7 +1,8 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import path from "path";
-import fs from "fs";
+import fs from 'fs';
+import path from 'path';
+import { defineConfig } from 'vite';
+
+import react from '@vitejs/plugin-react';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -30,6 +31,11 @@ export default defineConfig({
 			}
 		}
 	],
+	define: {
+		'process.env': {
+			VITE_API_URL: JSON.stringify(process.env.VITE_API_URL || 'https://api.surestrat.xyz/api/v1')
+		}
+	},
 	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "./src"),

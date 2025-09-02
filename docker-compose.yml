@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  pine-transfer-form:
+    build: .
+    container_name: pine-transfer-form
+    ports:
+      - "${PORT:-4173}:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - VITE_API_URL=${VITE_API_URL:-https://api.surestrat.xyz/api/v1}
+    env_file:
+      - .env
+    networks:
+      - pine-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Development service for local development
+  pine-transfer-form-dev:
+    build:
+      context: .
+      target: base
+    container_name: pine-transfer-form-dev
+    ports:
+      - "${PORT:-4173}:5173"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=${VITE_API_URL:-https://api.surestrat.xyz/api/v1}
+    env_file:
+      - .env
+    command: bun run dev --host 0.0.0.0
+    networks:
+      - pine-network
+    restart: unless-stopped
+    profiles:
+      - dev
+
+networks:
+  pine-network:
+    driver: bridge
