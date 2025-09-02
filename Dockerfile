@@ -20,7 +20,7 @@ COPY . .
 RUN npm run build
 
 # Expose port 3000
-EXPOSE 3000
+EXPOSE 3939
 
 # Serve the built application with SPA support
 CMD ["serve", "-s", "dist"]
