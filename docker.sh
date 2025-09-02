@@ -72,7 +72,7 @@ start_dev() {
     print_status "Starting development environment..."
     print_status "Note: Bun lockfiles (bun.lock/bun.lockb) are optional - build will work without them"
     docker-compose -f docker-compose.yml -f docker-compose.dev.yml up pine-transfer-form-dev --build -d
-    local port=${PORT:-4173}
+    local port=${PORT:-4343}
     print_success "Development server started on http://localhost:$port"
     print_status "To view logs: $0 logs"
 }
@@ -86,7 +86,7 @@ start_prod() {
     
     print_status "Starting production environment..."
     docker-compose up pine-transfer-form -d
-    local port=${PORT:-4173}
+    local port=${PORT:-4343}
     print_success "Production server started on http://localhost:$port"
     print_status "To view logs: $0 logs"
 }
@@ -139,7 +139,7 @@ show_env() {
     print_status "Environment Configuration:"
     if [ -f .env ]; then
         echo "  .env file: ✓ Found"
-        echo "  PORT: ${PORT:-4173} (default)"
+        echo "  PORT: ${PORT:-4343} (default)"
         echo "  NODE_ENV: ${NODE_ENV:-production} (default)"
         echo "  VITE_API_URL: ${VITE_API_URL:-https://api.surestrat.xyz/api/v1} (default)"
         if [ -n "$DOCKER_REGISTRY" ]; then

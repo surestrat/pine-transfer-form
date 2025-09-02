@@ -113,7 +113,7 @@ show_usage() {
     echo "  DOCKER_REGISTRY   Docker registry URL (optional)"
     echo "  DOCKER_USERNAME   Docker registry username"
     echo "  DOCKER_PASSWORD   Docker registry password"
-    echo "  PORT             Application port (default: 4173)"
+    echo "  PORT             Application port (default: 4343)"
     echo "  VITE_API_URL     API URL"
     echo ""
     echo "Examples:"
@@ -185,7 +185,7 @@ echo ""
 print_info "Image built with the following configuration:"
 echo "  - Target: $TARGET"
 echo "  - API URL: $VITE_API_URL"
-echo "  - Port: ${PORT:-4173}"
+echo "  - Port: ${PORT:-4343}"
 if [ -n "$DOCKER_REGISTRY" ]; then
     echo "  - Registry: $DOCKER_REGISTRY"
 fi

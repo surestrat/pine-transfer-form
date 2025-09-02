@@ -1,4 +1,13 @@
-# Development-specific Docker Compose override
+# De  pine-transfer-form-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: pine-transfer-form-dev
+    ports:
+      - "${PORT:-4343}:5173"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modulesspecific Docker Compose override
 version: '3.8'
 
 services:

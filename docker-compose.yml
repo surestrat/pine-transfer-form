@@ -5,7 +5,7 @@ services:
     build: .
     container_name: pine-transfer-form
     ports:
-      - "${PORT:-4173}:3000"
+      - "${PORT:-4343}:3000"
     environment:
       - NODE_ENV=${NODE_ENV:-production}
       - VITE_API_URL=${VITE_API_URL:-https://api.surestrat.xyz/api/v1}
@@ -28,7 +28,7 @@ services:
       target: base
     container_name: pine-transfer-form-dev
     ports:
-      - "${PORT:-4173}:5173"
+      - "${PORT:-4343}:5173"
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules

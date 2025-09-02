@@ -55,7 +55,7 @@ docker-compose logs -f pine-transfer-form-dev
 
 #### Production Environment
 ```bash
-# Build and start production server on port 4173
+# Build and start production server on port 4343
 docker-compose up pine-transfer-form --build -d
 
 # View logs
@@ -76,12 +76,12 @@ DOCKER_PASSWORD=your-password
 
 # Application
 NODE_ENV=production
-PORT=4173
+PORT=4343
 ```
 
 ### Ports
-- **Development**: `http://localhost:${PORT:-4173}`
-- **Production**: `http://localhost:${PORT:-4173}`
+- **Development**: `http://localhost:${PORT:-4343}`
+- **Production**: `http://localhost:${PORT:-4343}`
 
 ### API Configuration
 - **Production API**: Configured via `VITE_API_URL` in .env
@@ -97,7 +97,7 @@ PORT=4173
 
 ### pine-transfer-form (Production)
 - **Image**: Multi-stage build optimized for production
-- **Port**: 4173:3000 (external:internal)
+- **Port**: 4343:3000 (external:internal)
 - **Features**: 
   - Optimized build with Bun
   - Health checks
@@ -105,7 +105,7 @@ PORT=4173
 
 ### pine-transfer-form-dev (Development)
 - **Image**: Development-optimized build
-- **Port**: 4173:5173 (external:internal)
+- **Port**: 4343:5173 (external:internal)
 - **Features**:
   - Hot module replacement
   - Volume mounting for live code changes
@@ -160,13 +160,13 @@ PORT=4173
    ```
 
 2. **Access Application**:
-   - Open `http://localhost:4173`
+   - Open `http://localhost:4343`
    - Application connects to production API at `https://api.surestrat.xyz`
 
 ## Troubleshooting
 
 ### Port Already in Use
-If port 4173 is already in use, you can modify the port mapping in the docker-compose files:
+If port 4343 is already in use, you can modify the port mapping in the docker-compose files:
 ```yaml
 ports:
   - "YOUR_PORT:3000"  # for production
