@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Pine Transfer Form Docker Management Script
+# Simple Docker management script for Pine Transfer Form
 
 set -e
 
@@ -11,8 +11,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Function to print colored output
-print_status() {
+print_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
 }
 
@@ -28,185 +27,131 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Function to check and load environment
-check_env() {
-    if [ ! -f .env ]; then
-        print_warning "No .env file found!"
-        print_status "Copying .env.example to .env..."
-        if [ -f .env.example ]; then
-            cp .env.example .env
-            print_success "Created .env from .env.example"
-            print_warning "Please edit .env file to configure your settings"
-        else
-            print_error ".env.example not found. Please create .env manually."
-        fi
-    else
-        print_status "Using existing .env configuration"
-    fi
-}
-
-# Function to show usage
 show_usage() {
-    echo "Pine Transfer Form Docker Management"
+    echo "Pine Transfer Form - Docker Management Script"
     echo ""
     echo "Usage: $0 [COMMAND]"
     echo ""
     echo "Commands:"
-    echo "  dev         Start development environment"
+    echo "  dev         Start development environment with hot reload"
     echo "  prod        Start production environment"
-    echo "  build       Build production image"
-    echo "  secure-build Build with registry authentication (optional push)"
-    echo "  test        Test Docker builds with/without lockfiles"
+    echo "  build       Build production Docker image"
     echo "  stop        Stop all containers"
-    echo "  clean       Stop containers and remove images"
-    echo "  logs        Show logs for running containers"
-    echo "  shell       Open shell in development container"
-    echo "  health      Check container status"
-    echo "  env         Show environment configuration"
+    echo "  clean       Stop and remove containers and images"
+    echo "  logs        Show container logs"
+    echo "  shell       Open shell in running container"
+    echo "  health      Check container health status"
+    echo "  test        Test Docker builds"
+    echo "  env         Show current environment configuration"
     echo ""
+    echo "Examples:"
+    echo "  $0 dev                    # Start development server"
+    echo "  $0 prod                   # Start production server"
+    echo "  $0 logs                   # View logs"
+    echo "  $0 clean                  # Clean up everything"
 }
 
-# Function to start development environment
-start_dev() {
-    check_env
-    print_status "Starting development environment..."
-    print_status "Note: Bun lockfiles (bun.lock/bun.lockb) are optional - build will work without them"
-    docker-compose -f docker-compose.yml -f docker-compose.dev.yml up pine-transfer-form-dev --build -d
-    local port=${PORT:-4343}
-    print_success "Development server started on http://localhost:$port"
-    print_status "To view logs: $0 logs"
-}
-
-# Function to start production environment
-start_prod() {
-    check_env
-    print_status "Building production image..."
-    print_status "Note: Bun lockfiles (bun.lock/bun.lockb) are optional - build will work without them"
-    docker-compose build pine-transfer-form
-    
-    print_status "Starting production environment..."
-    docker-compose up pine-transfer-form -d
-    local port=${PORT:-4343}
-    print_success "Production server started on http://localhost:$port"
-    print_status "To view logs: $0 logs"
-}
-
-# Function to build production image
-build_prod() {
-    check_env
-    print_status "Building production image using secure build script..."
-    chmod +x build-docker.sh
-    ./build-docker.sh prod
-}
-
-# Function to stop containers
-stop_containers() {
-    print_status "Stopping all containers..."
-    docker-compose down
-    print_success "All containers stopped"
-}
-
-# Function to clean up
-clean_up() {
-    print_status "Stopping containers and removing images..."
-    docker-compose down --rmi all --volumes --remove-orphans
-    print_success "Cleanup completed"
-}
-
-# Function to show logs
-show_logs() {
-    docker-compose logs -f
-}
-
-# Function to open shell in development container
-open_shell() {
-    print_status "Opening shell in development container..."
-    docker-compose exec pine-transfer-form-dev sh
-}
-
-# Function to run secure build
-secure_build() {
-    check_env
-    print_status "Running secure build with authentication..."
-    chmod +x build-docker.sh
-    shift # Remove the 'secure-build' argument
-    ./build-docker.sh "$@"
-}
-
-# Function to show environment info
-show_env() {
-    check_env
-    print_status "Environment Configuration:"
+load_env() {
     if [ -f .env ]; then
-        echo "  .env file: ✓ Found"
-        echo "  PORT: ${PORT:-4343} (default)"
-        echo "  NODE_ENV: ${NODE_ENV:-production} (default)"
-        echo "  VITE_API_URL: ${VITE_API_URL:-https://api.surestrat.xyz/api/v1} (default)"
-        if [ -n "$DOCKER_REGISTRY" ]; then
-            echo "  DOCKER_REGISTRY: $DOCKER_REGISTRY"
-        else
-            echo "  DOCKER_REGISTRY: Not configured"
-        fi
+        print_info "Loading environment variables from .env file..."
+        export $(grep -v '^#' .env | xargs)
     else
-        echo "  .env file: ✗ Not found"
+        print_warning "No .env file found. Using default values."
+        print_info "Consider copying .env.example to .env and configuring your settings."
     fi
 }
 
-# Function to test Docker builds
-test_builds() {
-    check_env
-    print_status "Running Docker lockfile compatibility tests..."
-    chmod +x test-docker.sh
-    ./test-docker.sh
-}
-
-# Function to check health
-check_health() {
-    print_status "Checking container health..."
-    docker-compose ps
-}
-
-# Main script logic
-case "$1" in
-    "dev")
-        start_dev
+case "${1:-help}" in
+    dev)
+        load_env
+        print_info "Starting development environment..."
+        docker-compose --profile dev up --build -d
+        print_success "Development server started on http://localhost:${PORT:-4343}"
+        print_info "Use '$0 logs' to view output"
         ;;
-    "prod")
-        start_prod
+    
+    prod)
+        load_env
+        print_info "Starting production environment..."
+        docker-compose up --build -d
+        print_success "Production server started on http://localhost:${PORT:-4343}"
+        print_info "Use '$0 logs' to view output"
         ;;
-    "build")
-        build_prod
+    
+    build)
+        load_env
+        print_info "Building production Docker image..."
+        docker-compose build
+        print_success "Production image built successfully"
         ;;
-    "secure-build")
-        secure_build "$@"
+    
+    stop)
+        print_info "Stopping all containers..."
+        docker-compose --profile dev down
+        docker-compose down
+        print_success "All containers stopped"
         ;;
-    "test")
-        test_builds
+    
+    clean)
+        print_info "Cleaning up containers and images..."
+        docker-compose --profile dev down --rmi all --volumes
+        docker-compose down --rmi all --volumes
+        print_success "Cleanup completed"
         ;;
-    "stop")
-        stop_containers
+    
+    logs)
+        if docker ps | grep -q "pine-transfer-form-dev"; then
+            print_info "Showing development logs..."
+            docker-compose --profile dev logs -f
+        elif docker ps | grep -q "pine-transfer-form"; then
+            print_info "Showing production logs..."
+            docker-compose logs -f
+        else
+            print_warning "No Pine Transfer Form containers are running"
+        fi
         ;;
-    "clean")
-        clean_up
+    
+    shell)
+        if docker ps | grep -q "pine-transfer-form-dev"; then
+            print_info "Opening shell in development container..."
+            docker exec -it pine-transfer-form-dev sh
+        elif docker ps | grep -q "pine-transfer-form"; then
+            print_info "Opening shell in production container..."
+            docker exec -it pine-transfer-form sh
+        else
+            print_error "No Pine Transfer Form containers are running"
+            exit 1
+        fi
         ;;
-    "logs")
-        show_logs
+    
+    health)
+        if docker ps | grep -q "pine-transfer-form"; then
+            print_info "Checking container health..."
+            docker inspect --format='{{json .State.Health}}' pine-transfer-form | jq '.'
+        else
+            print_warning "Production container is not running"
+        fi
         ;;
-    "shell")
-        open_shell
+    
+    test)
+        print_info "Running Docker build tests..."
+        ./test-docker.sh
         ;;
-    "health")
-        check_health
+    
+    env)
+        load_env
+        print_info "Current environment configuration:"
+        echo "  - API URL: ${VITE_API_URL:-https://api.surestrat.xyz/api/v1}"
+        echo "  - Port: ${PORT:-4343}"
+        echo "  - Node Environment: ${NODE_ENV:-production}"
         ;;
-    "env")
-        show_env
-        ;;
-    "")
+    
+    help|--help|-h)
         show_usage
         ;;
+    
     *)
         print_error "Unknown command: $1"
-        echo ""
         show_usage
         exit 1
         ;;

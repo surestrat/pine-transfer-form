@@ -1,11 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { CheckCircle, ArrowRight, RefreshCw, ExternalLink } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import Logo from "@components/ui/Logo";
-import { Button } from "@components/ui/Button";
-import { useFormStore } from "@store/formStore";
-import "@styles/SuccessPage.css";
+import '@styles/SuccessPage.css';
+
+import {
+  useEffect,
+  useState,
+} from 'react';
+
+import { motion } from 'framer-motion';
+import {
+  CheckCircle,
+  ExternalLink,
+  RefreshCw,
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+import { Button } from '@components/ui/Button';
+import Logo from '@components/ui/Logo';
+import { useFormStore } from '@store/formStore';
 
 const SuccessPage = () => {
 	const navigate = useNavigate();
@@ -37,10 +47,7 @@ const SuccessPage = () => {
 					"Found redirect URL in apiResponse.redirect_url:",
 					finalRedirectUrl
 				);
-			} else if (
-				storedApiResponse.data &&
-				storedApiResponse.data.redirect_url
-			) {
+			} else if (storedApiResponse.data?.redirect_url) {
 				finalRedirectUrl = storedApiResponse.data.redirect_url;
 				console.log(
 					"Found redirect URL in apiResponse.data.redirect_url:",
@@ -53,8 +60,8 @@ const SuccessPage = () => {
 						typeof storedApiResponse.api_response === "string"
 							? JSON.parse(storedApiResponse.api_response)
 							: storedApiResponse.api_response;
-
-					if (parsedResponse.data && parsedResponse.data.redirect_url) {
+		
+					if (parsedResponse.data?.redirect_url) {
 						finalRedirectUrl = parsedResponse.data.redirect_url;
 						console.log(
 							"Found redirect URL in parsed api_response:",
@@ -105,14 +112,14 @@ const SuccessPage = () => {
 				storedApiResponse
 			);
 		}
-	}, []);
+	}, [apiResponse, redirectUrl, resetForm]);
 
 	const handleManualRedirect = () => {
 		// Try all possible locations for the redirect URL, including session storage
 		const url =
 			redirectUrl ||
-			(apiResponse && apiResponse.redirect_url) ||
-			(apiResponse && apiResponse.data && apiResponse.data.redirect_url) ||
+			apiResponse?.redirect_url ||
+			apiResponse?.data?.redirect_url ||
 			sessionStorage.getItem("redirectUrl");
 
 		if (url) {
@@ -127,8 +134,8 @@ const SuccessPage = () => {
 	useEffect(() => {
 		const hasUrl = Boolean(
 			redirectUrl ||
-				(apiResponse && apiResponse.redirect_url) ||
-				(apiResponse && apiResponse.data && apiResponse.data.redirect_url) ||
+				apiResponse?.redirect_url ||
+				apiResponse?.data?.redirect_url ||
 				sessionStorage.getItem("redirectUrl")
 		);
 		setHasRedirectUrl(hasUrl);
@@ -186,7 +193,7 @@ const SuccessPage = () => {
 						</p>
 						<div className="url-display">
 							{redirectUrl ||
-								(apiResponse && apiResponse.redirect_url) ||
+								apiResponse?.redirect_url ||
 								sessionStorage.getItem("redirectUrl") ||
 								""}
 						</div>

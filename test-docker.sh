@@ -42,7 +42,7 @@ fi
 print_test "Building Docker image without lockfile..."
 rm -f bun.lock* 2>/dev/null || true
 
-if docker build -f Dockerfile.dev -t pine-test-no-lock . > /tmp/docker-build-no-lock.log 2>&1; then
+if docker build -t pine-test-no-lock . > /tmp/docker-build-no-lock.log 2>&1; then
     print_success "Docker build succeeded without lockfile"
 else
     print_error "Docker build failed without lockfile"
@@ -61,7 +61,7 @@ if [ -f "$BACKUP_DIR/bun.lock" ]; then
     cp "$BACKUP_DIR/bun.lock" .
 fi
 
-if docker build -f Dockerfile.dev -t pine-test-with-lock . > /tmp/docker-build-with-lock.log 2>&1; then
+if docker build -t pine-test-with-lock . > /tmp/docker-build-with-lock.log 2>&1; then
     print_success "Docker build succeeded with lockfile"
 else
     print_error "Docker build failed with lockfile"
@@ -72,7 +72,7 @@ fi
 # Test 3: Test production build
 print_test "Testing production Docker build..."
 
-if docker build -f Dockerfile -t pine-test-prod . > /tmp/docker-build-prod.log 2>&1; then
+if docker build -t pine-test-prod . > /tmp/docker-build-prod.log 2>&1; then
     print_success "Production Docker build succeeded"
 else
     print_error "Production Docker build failed"
