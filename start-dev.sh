@@ -13,7 +13,8 @@ VITE_PINE_API_URL=https://api.surestrat.xyz/api/v1/transfer
 VITE_QUOTE_API_URL=https://api.surestrat.xyz/api/v1/quote
 
 # Docker Configuration
-PORT=4343
+PORT=3573
+DEV_PORT=5173
 NODE_ENV=development
 EOL
     echo "✅ Default .env file created"

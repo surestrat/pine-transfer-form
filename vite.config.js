@@ -31,13 +31,8 @@ export default defineConfig({
 			}
 		}
 	],
-	// Remove the define section that was causing issues
 	build: {
 		sourcemap: true, // Enable source maps for better debugging
-	},
-	server: {
-		host: '0.0.0.0',
-		port: 3573,
 	},
 	resolve: {
 		alias: {
