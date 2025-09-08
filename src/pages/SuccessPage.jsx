@@ -7,139 +7,99 @@ import {
 
 import { motion } from 'framer-motion';
 import {
+  Check,
   CheckCircle,
-  ExternalLink,
+  Copy,
+  DollarSign,
+  FileText,
+  Mail,
+  Plus,
   RefreshCw,
+  Shield,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@components/ui/Button';
 import Logo from '@components/ui/Logo';
+import { getQuoteById } from '@services/quoteApiService';
 import { useFormStore } from '@store/formStore';
 
 const SuccessPage = () => {
 	const navigate = useNavigate();
 	const resetForm = useFormStore((state) => state.resetForm);
-	const apiResponse = useFormStore((state) => state.apiResponse);
-	const redirectUrl = useFormStore((state) => state.redirectUrl);
-	const [countdown, setCountdown] = useState(5);
-	const [isRedirecting, setIsRedirecting] = useState(false);
+	const [quoteInfo, setQuoteInfo] = useState(null);
+	const [copiedField, setCopiedField] = useState(null);
 
-	useEffect(() => {
-		// Store values locally to prevent issues with state reset
-		const storedRedirectUrl = redirectUrl;
-		const storedApiResponse = apiResponse;
-
-		// Check API response directly as a fallback
-		let finalRedirectUrl = storedRedirectUrl;
-
-		console.log("Initial redirect check:", {
-			redirectUrl: storedRedirectUrl,
-			apiResponse: storedApiResponse,
-		});
-
-		// If redirectUrl is not set, try to extract it from apiResponse
-		if (!finalRedirectUrl && storedApiResponse) {
-			// Try all potential locations for redirect_url
-			if (storedApiResponse.redirect_url) {
-				finalRedirectUrl = storedApiResponse.redirect_url;
-				console.log(
-					"Found redirect URL in apiResponse.redirect_url:",
-					finalRedirectUrl
-				);
-			} else if (storedApiResponse.data?.redirect_url) {
-				finalRedirectUrl = storedApiResponse.data.redirect_url;
-				console.log(
-					"Found redirect URL in apiResponse.data.redirect_url:",
-					finalRedirectUrl
-				);
-			} else if (storedApiResponse.api_response) {
-				// Try to parse if it's a string
-				try {
-					const parsedResponse =
-						typeof storedApiResponse.api_response === "string"
-							? JSON.parse(storedApiResponse.api_response)
-							: storedApiResponse.api_response;
-		
-					if (parsedResponse.data?.redirect_url) {
-						finalRedirectUrl = parsedResponse.data.redirect_url;
-						console.log(
-							"Found redirect URL in parsed api_response:",
-							finalRedirectUrl
-						);
-					}
-				} catch (error) {
-					console.error("Error parsing API response:", error);
-				}
-			}
-		}
-
-		// Store the URL in session storage before resetting the form
-		if (finalRedirectUrl) {
-			sessionStorage.setItem("redirectUrl", finalRedirectUrl);
-		} else {
-			// Try to get from session storage as last resort
-			finalRedirectUrl = sessionStorage.getItem("redirectUrl");
-		}
-
-		// Handle form reset (do this after extracting and saving the URL)
-		resetForm();
-
-		// Redirect logic only if finalRedirectUrl exists
-		if (finalRedirectUrl) {
-			console.log("Using redirect URL:", finalRedirectUrl);
-			setIsRedirecting(true);
-
-			// Set up countdown timer
-			const timer = setInterval(() => {
-				setCountdown((prev) => {
-					if (prev <= 1) {
-						clearInterval(timer);
-						// Redirect to the URL
-						console.log("Redirecting now to:", finalRedirectUrl);
-						window.location.href = finalRedirectUrl;
-						return 0;
-					}
-					return prev - 1;
-				});
-			}, 1000);
-
-			// Clean up timer
-			return () => clearInterval(timer);
-		} else {
-			console.log(
-				"No redirect URL found in any response object. API Response:",
-				storedApiResponse
-			);
-		}
-	}, [apiResponse, redirectUrl, resetForm]);
-
-	const handleManualRedirect = () => {
-		// Try all possible locations for the redirect URL, including session storage
-		const url =
-			redirectUrl ||
-			apiResponse?.redirect_url ||
-			apiResponse?.data?.redirect_url ||
-			sessionStorage.getItem("redirectUrl");
-
-		if (url) {
-			window.location.href = url;
+	// Copy to clipboard handler
+	const copyToClipboard = async (text, fieldName) => {
+		try {
+			await navigator.clipboard.writeText(text);
+			setCopiedField(fieldName);
+			// Reset the copied state after 2 seconds
+			setTimeout(() => setCopiedField(null), 2000);
+		} catch (error) {
+			console.error('Failed to copy to clipboard:', error);
+			// Fallback for older browsers
+			const textArea = document.createElement('textarea');
+			textArea.value = text;
+			document.body.appendChild(textArea);
+			textArea.select();
+			document.execCommand('copy');
+			document.body.removeChild(textArea);
+			setCopiedField(fieldName);
+			setTimeout(() => setCopiedField(null), 2000);
 		}
 	};
 
-	// Determine if we have a valid redirect URL from any source
-	const [hasRedirectUrl, setHasRedirectUrl] = useState(false);
-
-	// Check all possible sources for redirect URL
+	// Get quote information if available
 	useEffect(() => {
-		const hasUrl = Boolean(
-			redirectUrl ||
-				apiResponse?.redirect_url ||
-				apiResponse?.data?.redirect_url ||
-				sessionStorage.getItem("redirectUrl")
-		);
-		setHasRedirectUrl(hasUrl);
-	}, [redirectUrl, apiResponse]);
+		const fetchQuoteInfo = async () => {
+			try {
+				// First check sessionStorage for quote information
+				const quoteResult = sessionStorage.getItem('quoteResult');
+				if (quoteResult) {
+					const parsedQuote = JSON.parse(quoteResult);
+					setQuoteInfo(parsedQuote);
+					console.log("[SuccessPage] Found quote information in sessionStorage:", parsedQuote);
+					return;
+				}
+				
+				// If no sessionStorage data, try to fetch from API using quote_id from form
+				const customer_info = useFormStore.getState().customer_info;
+				if (customer_info.quote_id) {
+					console.log("[SuccessPage] Fetching quote info for quote_id:", customer_info.quote_id);
+					const apiQuoteInfo = await getQuoteById(customer_info.quote_id);
+					setQuoteInfo(apiQuoteInfo);
+					console.log("[SuccessPage] Fetched quote information from API:", apiQuoteInfo);
+				}
+			} catch (error) {
+				console.error("[SuccessPage] Error fetching quote information:", error);
+				// Don't show error to user, just continue without quote info
+			}
+		};
+		
+		fetchQuoteInfo();
+	}, []);
+
+	// Reset form on component mount
+	useEffect(() => {
+		resetForm();
+	}, [resetForm]);
+
+	const handleNewQuote = () => {
+		// Clear any existing quote data
+		sessionStorage.removeItem('quoteResult');
+		sessionStorage.removeItem('quoteId');
+		sessionStorage.removeItem('quoteData');
+		sessionStorage.removeItem('quoteStatus');
+		navigate('/quote');
+	};
+
+	const handleNewTransfer = () => {
+		// Clear form data and navigate to transfer form
+		resetForm();
+		navigate('/');
+	};
 
 	return (
 		<div className="success-page">
@@ -173,65 +133,170 @@ const SuccessPage = () => {
 				</motion.div>
 
 				<h1 className="success-title">
-					<span className="success-title-accent">Submission</span> Received!
+					<span className="success-title-accent">Transfer</span> Successful!
 				</h1>
-				<p className="success-message">
-					Thank you! The customer's information has been successfully
-					transferred and recorded.
-				</p>
+				
+				{quoteInfo ? (
+					<div className="success-content">
+						<p className="success-message">
+							Your quote and customer information have been successfully transferred to Pineapple Insurance.
+						</p>
+						
+						<motion.div
+							className="quote-summary"
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ delay: 0.8 }}
+						>
+							<div className="quote-header">
+								<DollarSign className="quote-icon" size={20} />
+								<h3>Your Insurance Quote</h3>
+							</div>
+							
+							<div className="quote-copy-notice">
+								<Mail size={16} className="notice-icon" />
+								<span>A copy of this quote will be emailed to you</span>
+							</div>
+							
+							<div className="quote-details">
+								<button 
+									className="quote-item clickable" 
+									onClick={() => copyToClipboard(`R${quoteInfo.premium ? quoteInfo.premium.toFixed(2) : 'N/A'}`, 'premium')}
+									title="Click to copy premium amount"
+									type="button"
+								>
+									<span className="quote-label">Monthly Premium:</span>
+									<span className="quote-value-container">
+										<span className="quote-value">R{quoteInfo.premium ? quoteInfo.premium.toFixed(2) : 'N/A'}</span>
+										{copiedField === 'premium' ? (
+											<Check size={16} className="copy-icon copied" />
+										) : (
+											<Copy size={16} className="copy-icon" />
+										)}
+									</span>
+								</button>
+								
+								{quoteInfo.excess && (
+									<button 
+										className="quote-item clickable"
+										onClick={() => copyToClipboard(`R${quoteInfo.excess.toFixed(2)}`, 'excess')}
+										title="Click to copy excess amount"
+										type="button"
+									>
+										<span className="quote-label">Excess:</span>
+										<span className="quote-value-container">
+											<span className="quote-value">R{quoteInfo.excess.toFixed(2)}</span>
+											{copiedField === 'excess' ? (
+												<Check size={16} className="copy-icon copied" />
+											) : (
+												<Copy size={16} className="copy-icon" />
+											)}
+										</span>
+									</button>
+								)}
+								
+								{quoteInfo.quoteId && (
+									<button 
+										className="quote-item clickable"
+										onClick={() => copyToClipboard(quoteInfo.quoteId, 'quoteId')}
+										title="Click to copy Quote ID"
+										type="button"
+									>
+										<span className="quote-label">Quote ID:</span>
+										<span className="quote-value-container">
+											<span className="quote-value">{quoteInfo.quoteId}</span>
+											{copiedField === 'quoteId' ? (
+												<Check size={16} className="copy-icon copied" />
+											) : (
+												<Copy size={16} className="copy-icon" />
+											)}
+										</span>
+									</button>
+								)}
+								
+								{quoteInfo.referenceId && (
+									<button 
+										className="quote-item clickable"
+										onClick={() => copyToClipboard(quoteInfo.referenceId, 'referenceId')}
+										title="Click to copy Reference ID"
+										type="button"
+									>
+										<span className="quote-label">Reference:</span>
+										<span className="quote-value-container">
+											<span className="quote-value">{quoteInfo.referenceId}</span>
+											{copiedField === 'referenceId' ? (
+												<Check size={16} className="copy-icon copied" />
+											) : (
+												<Copy size={16} className="copy-icon" />
+											)}
+										</span>
+									</button>
+								)}
+							</div>
+						</motion.div>
 
-				{isRedirecting ? (
-					<motion.div
-						className="success-info"
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: 0.6 }}
-					>
-						<p className="success-info-heading">
-							<ExternalLink size={16} className="info-icon" />
-							Redirecting to Pineapple in {countdown} seconds...
+						<motion.div
+							className="next-steps"
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ delay: 1.0 }}
+						>
+							<div className="steps-header">
+								<Shield className="steps-icon" size={20} />
+								<h3>What Happens Next?</h3>
+							</div>
+							<ul className="steps-list">
+								<li>Pineapple Insurance will contact you within 24 hours</li>
+								<li>They'll review your quote and finalize your policy details</li>
+								<li>You'll receive your policy documents via email</li>
+								<li>Your coverage will begin as per the agreed start date</li>
+							</ul>
+						</motion.div>
+					</div>
+				) : (
+					<div className="success-content">
+						<p className="success-message">
+							Thank you! The customer's information has been successfully transferred to Pineapple Insurance.
 						</p>
-						<div className="url-display">
-							{redirectUrl ||
-								apiResponse?.redirect_url ||
-								sessionStorage.getItem("redirectUrl") ||
-								""}
-						</div>
-					</motion.div>
-				) : hasRedirectUrl ? null : (
-					<motion.div
-						className="warning-info"
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: 0.6 }}
-					>
-						<p className="warning-heading">
-							<ExternalLink size={16} className="info-icon" />
-							No redirect URL was found
-						</p>
-					</motion.div>
+						
+						<motion.div
+							className="next-steps"
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ delay: 0.8 }}
+						>
+							<div className="steps-header">
+								<FileText className="steps-icon" size={20} />
+								<h3>What Happens Next?</h3>
+							</div>
+							<ul className="steps-list">
+								<li>Pineapple Insurance will contact the customer within 24 hours</li>
+								<li>They'll provide a personalized insurance quote</li>
+								<li>The customer will receive policy options via email</li>
+								<li>Coverage can begin once the policy is finalized</li>
+							</ul>
+						</motion.div>
+					</div>
 				)}
 
 				<div className="action-container">
 					<Button
-						onClick={() => navigate("/")}
+						onClick={handleNewTransfer}
 						variant="primary"
 						className="action-button"
 					>
 						<RefreshCw size={18} className="button-icon" />
-						Submit Another Transfer
+						New Transfer
 					</Button>
 
-					{hasRedirectUrl && (
-						<Button
-							onClick={handleManualRedirect}
-							variant="outline"
-							className="action-button"
-						>
-							<ExternalLink size={18} className="button-icon" />
-							Go to Pineapple Now
-						</Button>
-					)}
+					<Button
+						onClick={handleNewQuote}
+						variant="outline"
+						className="action-button"
+					>
+						<Plus size={18} className="button-icon" />
+						Get New Quote
+					</Button>
 				</div>
 			</motion.div>
 		</div>

@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import { processAPIError } from '@utils/errorHandler';
+
 // Get the API URL from environment variables
 const API_URL = 
     import.meta.env.VITE_PINE_API_URL || 
@@ -36,34 +38,10 @@ axiosInstance.interceptors.response.use(undefined, async (err) => {
     return axiosInstance(config);
 });
 
-// Custom error types for better error handling
-class ApiError extends Error {
-    constructor(message, status, details = null) {
-        super(message);
-        this.name = 'ApiError';
-        this.status = status;
-        this.details = details;
-    }
-}
-
-class NetworkError extends Error {
-    constructor(message) {
-        super(message || 'Network connection issue. Please check your internet connection.');
-        this.name = 'NetworkError';
-    }
-}
-
-class ValidationError extends Error {
-    constructor(details) {
-        super('Validation Error');
-        this.name = 'ValidationError';
-        this.details = details;
-    }
-}
-
 export const submitForm = async (payload) => {
     try {
         console.log("[apiService] submitForm called with payload:", payload);
+        
         // Format the customer info
         const customerInfo = {
             source: "SureStrat",
@@ -116,51 +94,39 @@ export const submitForm = async (payload) => {
 
         const response = await Promise.race([fetchPromise, timeoutPromise]);
         console.log("[apiService] API response:", response);
-        return response.data;
+        
+        // Handle the new structured API response format
+        const responseData = response.data;
+        
+        // Check if response has the new structured format
+        if (responseData && typeof responseData.success === 'boolean') {
+            if (responseData.success) {
+                // Successful response - return the data
+                console.log("[apiService] Successful response data:", responseData.data);
+                return responseData.data;
+            } else {
+                // Error response - process and throw structured error
+                const error = processAPIError({ response: { data: responseData } }, 'apiService');
+                console.error("[apiService] API returned error:", error);
+                throw error;
+            }
+        } else {
+            // Legacy response format - assume success and return as-is
+            console.log("[apiService] Legacy response format detected:", responseData);
+            return responseData;
+        }
+        
     } catch (error) {
         console.error("[apiService] Error during submitForm:", error);
-        // Network errors
-        if (!error.response) {
-            throw new NetworkError(
-                'Unable to connect to the server. Please check your internet connection and try again.'
-            );
+        
+        // If it's already a processed error, just throw it
+        if (error.name === 'APIError' || error.name === 'ValidationError' || 
+            error.name === 'DuplicateError' || error.name === 'NetworkError') {
+            throw error;
         }
-
-        // API errors
-        switch (error.response.status) {
-            case 400:
-                throw new ApiError(
-                    'The submitted information was invalid. Please check your inputs and try again.',
-                    400,
-                    error.response.data
-                );
-            case 401:
-                throw new ApiError(
-                    'Your session has expired. Please refresh the page and try again.',
-                    401
-                );
-            case 403:
-                throw new ApiError(
-                    'You do not have permission to perform this action.',
-                    403
-                );
-            case 422:
-                throw new ValidationError(error.response.data.detail);
-            case 429:
-                throw new ApiError(
-                    'Too many requests. Please wait a moment and try again.',
-                    429
-                );
-            case 500:
-                throw new ApiError(
-                    'An unexpected server error occurred. Our team has been notified.',
-                    500
-                );
-            default:
-                throw new ApiError(
-                    'An unexpected error occurred. Please try again.',
-                    error.response.status
-                );
-        }
+        
+        // Process unhandled errors
+        const processedError = processAPIError(error, 'apiService');
+        throw processedError;
     }
 };

@@ -64,8 +64,31 @@ const WaitingPage = () => {
                 
                 let displayMessage = errorData.message || 'An error occurred while processing your quote';
                 
-                // If we have validation details, show more specific message
-                if (errorData.details && Array.isArray(errorData.details)) {
+                // Handle structured error types
+                if (errorData.errorType === 'ValidationError' && errorData.details) {
+                    if (Array.isArray(errorData.details)) {
+                        const validationMessages = errorData.details
+                            .map(detail => {
+                                if (typeof detail === 'object' && detail.message) {
+                                    return detail.message;
+                                } else if (typeof detail === 'object' && detail.msg) {
+                                    return detail.msg;
+                                }
+                                return String(detail);
+                            })
+                            .filter(msg => msg)
+                            .join(', ');
+                        
+                        if (validationMessages) {
+                            displayMessage = `Validation Error: ${validationMessages}`;
+                        }
+                    }
+                } else if (errorData.errorType === 'DuplicateError') {
+                    displayMessage = errorData.message;
+                } else if (errorData.errorType === 'NetworkError') {
+                    displayMessage = `${errorData.message} Please check your internet connection.`;
+                } else if (errorData.details && Array.isArray(errorData.details)) {
+                    // Legacy validation details handling
                     const validationMessages = errorData.details.map(detail => {
                         if (typeof detail === 'object' && detail.msg) {
                             return detail.msg;
@@ -308,6 +331,15 @@ const WaitingPage = () => {
 
     return (
         <div className="waiting-page">
+            {/* Floating Elements */}
+            <div className="floating-elements">
+                <div className="floating-element floating-element-1"></div>
+                <div className="floating-element floating-element-2"></div>
+                <div className="floating-element floating-element-3"></div>
+                <div className="floating-element floating-element-4"></div>
+                <div className="floating-element floating-element-5"></div>
+            </div>
+            
             <motion.div
                 className="header-container"
                 initial={{ y: -20, opacity: 0 }}

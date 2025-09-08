@@ -145,27 +145,37 @@ export const useFormStore = create((set, get) => ({
 			customer_info: cleanedCustomerInfo
 		}));
 
-		// Extract redirect URL from the response
+		// Extract redirect URL from the response based on new API format
 		let redirectUrl = null;
 
+		console.log("[formStore] Processing API response:", response);
+
 		if (response) {
+			// New API format - data is directly the response content
 			if (response.redirect_url) {
 				redirectUrl = response.redirect_url;
-			} else if (response.api_response && typeof response.api_response === "object") {
-				if (response.api_response.data && response.api_response.data.redirect_url) {
+				console.log("[formStore] Found redirect URL in response.redirect_url:", redirectUrl);
+			}
+			// Legacy format support
+			else if (response.api_response && typeof response.api_response === "object") {
+				if (response.api_response.data?.redirect_url) {
 					redirectUrl = response.api_response.data.redirect_url;
+					console.log("[formStore] Found redirect URL in response.api_response.data.redirect_url:", redirectUrl);
 				} else if (typeof response.api_response === "string") {
 					try {
 						const parsedResponse = JSON.parse(response.api_response);
-						if (parsedResponse.data && parsedResponse.data.redirect_url) {
+						if (parsedResponse.data?.redirect_url) {
 							redirectUrl = parsedResponse.data.redirect_url;
+							console.log("[formStore] Found redirect URL in parsed api_response:", redirectUrl);
 						}
 					} catch (e) {
-						console.error("Error parsing API response:", e);
+						console.error("[formStore] Error parsing API response:", e);
 					}
 				}
 			}
 		}
+
+		console.log("[formStore] Final redirect URL:", redirectUrl);
 
 		set({
 			apiResponse: response,

@@ -160,6 +160,66 @@
 	margin: 0;
 }
 
+.alert-recommendation {
+	margin: 0.5rem 0 0 0;
+	color: var(--color-gray-300);
+	font-size: 0.875rem;
+}
+
+.alert-info {
+	margin: 0.5rem 0 0 0;
+	color: var(--color-blue-300);
+	font-size: 0.875rem;
+}
+
+/* Agent copy notice styling */
+.agent-copy-notice {
+	margin-top: 0.5rem;
+	margin-bottom: 1rem;
+}
+
+.notice-content {
+	display: flex;
+	align-items: center;
+	padding: 0.75rem;
+	background-color: rgba(20, 184, 166, 0.1);
+	border: 1px solid rgba(20, 184, 166, 0.3);
+	border-radius: 0.5rem;
+	font-size: 0.875rem;
+}
+
+.notice-icon {
+	color: var(--color-teal-400);
+	margin-right: 0.5rem;
+	flex-shrink: 0;
+}
+
+.notice-text {
+	color: var(--color-teal-300);
+	line-height: 1.4;
+}
+
+/* Error type specific styling */
+.alert-box.duplicate {
+	border-color: var(--color-yellow-500);
+	background-color: rgba(251, 191, 36, 0.1);
+}
+
+.alert-box.validation {
+	border-color: var(--color-red-500);
+	background-color: rgba(239, 68, 68, 0.1);
+}
+
+.alert-box.network {
+	border-color: var(--color-orange-500);
+	background-color: rgba(249, 115, 22, 0.1);
+}
+
+.alert-box.api {
+	border-color: var(--color-purple-500);
+	background-color: rgba(147, 51, 234, 0.1);
+}
+
 .form-footer {
 	display: flex;
 	justify-content: flex-end; /* justify-end */

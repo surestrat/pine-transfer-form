@@ -1,16 +1,5 @@
 import '@styles/LeadForm.css';
 
-import React, {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-} from 'react';
-
-import {
-  AnimatePresence,
-  motion,
-} from 'framer-motion';
 import {
   AlertCircle,
   Check,
@@ -20,13 +9,28 @@ import {
   Phone,
   User,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import {
+  AnimatePresence,
+  motion,
+} from 'framer-motion';
+import React, {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react';
+import {
+	formatDuplicateError,
+	getErrorAction,
+	getFieldValidationErrors
+} from '@utils/errorHandler';
 
-import ErrorBoundary from '@components/ErrorBoundary';
 import { Button } from '@components/ui/Button';
+import ErrorBoundary from '@components/ErrorBoundary';
 import { InputField } from '@components/ui/InputField';
 import { submitForm } from '@services/apiService';
 import { useFormStore } from '@store/formStore';
+import { useNavigate } from 'react-router-dom';
 
 const branchOptions = [
 	{ value: "", label: "Select Office..." },
@@ -110,31 +114,92 @@ const LeadForm = () => {
 	};
 
 	const formatErrorMessage = (err) => {
+		console.log("[LeadForm] Formatting error:", err);
+		
+		// Handle structured API errors
+		if (err?.name) {
+			switch (err.name) {
+				case 'ValidationError': {
+					// Extract field-specific validation errors
+					const fieldErrors = getFieldValidationErrors(err.validationErrors || []);
+					
+					// Update form store with field-specific errors
+					Object.entries(fieldErrors).forEach(([field, message]) => {
+						// You may need to update the form store to handle API validation errors
+						console.log(`[LeadForm] Field error: ${field} - ${message}`);
+					});
+					
+					// Return general validation message
+					return {
+						message: err.message || 'Please check the provided data and try again.',
+						type: 'validation',
+						fieldErrors: fieldErrors
+					};
+				}
+					
+				case 'DuplicateError': {
+					const duplicateMessage = formatDuplicateError(err.details);
+					return {
+						message: duplicateMessage,
+						type: 'duplicate',
+						action: 'No action needed - transfer already completed'
+					};
+				}
+					
+				case 'NetworkError':
+					return {
+						message: err.message,
+						type: 'network',
+						action: 'Retry',
+						handler: handleRetry
+					};
+					
+				case 'APIError': {
+					const errorAction = getErrorAction(err);
+					return {
+						message: err.message,
+						type: 'api',
+						action: errorAction?.button,
+						handler: errorAction?.button === 'Retry' ? handleRetry : null,
+						recommendation: errorAction?.message
+					};
+				}
+					
+				default:
+					break;
+			}
+		}
+
+		// Legacy error handling
 		// If Zod validation error
 		if (err?.errors && Array.isArray(err.errors)) {
-			return err.errors
-				.map((detail) => {
-					const field = detail.path?.[detail.path.length - 1];
-					const fieldLabel =
-						{
-							first_name: "First Name",
-							last_name: "Last Name",
-							email: "Email Address",
-							contact_number: "Contact Number",
-							id_number: "ID Number",
-							quote_id: "Quote ID",
-							agent_email: "Agent Email",
-							branch_name: "Office",
-						}[field] || field;
-					return `${fieldLabel}: ${detail.message}`;
-				})
-				.join("\n");
+			return {
+				message: err.errors
+					.map((detail) => {
+						const field = detail.path?.[detail.path.length - 1];
+						const fieldLabel =
+							{
+								first_name: "First Name",
+								last_name: "Last Name",
+								email: "Email Address",
+								contact_number: "Contact Number",
+								id_number: "ID Number",
+								quote_id: "Quote ID",
+								agent_email: "Agent Email",
+								branch_name: "Office",
+							}[field] || field;
+						return `${fieldLabel}: ${detail.message}`;
+					})
+					.join("\n"),
+				type: 'validation'
+			};
 		}
 
 		// Network error (axios or fetch)
 		if (err?.isAxiosError) {
 			return {
 				message: err.message,
+				type: 'network',
 				action: "Retry",
 				handler: handleRetry,
 			};
@@ -147,20 +212,30 @@ const LeadForm = () => {
 					submitTimeoutRef.current = setTimeout(() => {
 						setError(null);
 					}, 5000);
-					return "Too many attempts. Please wait a moment.";
+					return {
+						message: "Too many attempts. Please wait a moment.",
+						type: 'rate_limit'
+					};
 				case 500:
 					return {
 						message: err.message,
+						type: 'server_error',
 						action: "Start Over",
 						handler: handleFormReset,
 					};
 				default:
-					return err.message;
+					return {
+						message: err.message,
+						type: 'api'
+					};
 			}
 		}
 
 		// Fallback
-		return err?.message || "An unexpected error occurred. Please try again.";
+		return {
+			message: err?.message || "An unexpected error occurred. Please try again.",
+			type: 'unknown'
+		};
 	};
 
 	const handleSubmit = async (e) => {
@@ -383,7 +458,15 @@ const LeadForm = () => {
 						 error={errors.agent_email}
 						 required
 						 icon={User}
-					 />{" "}
+					 />
+					 <div className="agent-copy-notice">
+						 <div className="notice-content">
+							 <Mail size={16} className="notice-icon" />
+							 <span className="notice-text">
+								 The agent will receive a copy of this submission for their records.
+							 </span>
+						 </div>
+					 </div>{" "}
 					<div className="form-group">
 									<label htmlFor={`branch_name-${branchNameId}`} className="form-label">
 										Office <span className="required-mark">*</span>
@@ -423,14 +506,24 @@ const LeadForm = () => {
 						initial={{ opacity: 0, y: -10 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0 }}
-						className="alert-box"
+						className={`alert-box ${error.type || ''}`}
 						role="alert"
 					>
 						<div className="alert-content">
 							<AlertCircle className="alert-icon" size={20} />
 							<div className="alert-message-container">
 								<p className="alert-message">{error.message || error}</p>
-								{error.action && (
+								{error.recommendation && (
+									<p className="alert-recommendation">
+										<small>{error.recommendation}</small>
+									</p>
+								)}
+								{error.type === 'duplicate' && (
+									<p className="alert-info">
+										<small>The customer's information has already been submitted and processed.</small>
+									</p>
+								)}
+								{error.action && error.handler && (
 									<button
 										type="button"
 										onClick={error.handler}

@@ -30,6 +30,9 @@ function QuoteForm() {
             const quoteResponse = await submitQuote(apiPayload);
             console.log('[QuoteForm] Quote submission response:', quoteResponse);
             
+            // The quoteResponse now contains the direct data from the API
+            // (processAPIError has already handled the success/error extraction)
+            
             // Check if we have a successful quote response
             if (quoteResponse && (quoteResponse.premium !== undefined || quoteResponse.quoteId)) {
                 // Store the original form data for potential retry/prefill
@@ -79,14 +82,23 @@ function QuoteForm() {
         } catch (error) {
             console.error('[QuoteForm] Error submitting quote:', error);
             
-            // Extract detailed error information
+            // Extract detailed error information from structured error
             let errorMessage = 'An error occurred while processing your quote';
             let errorDetails = null;
             
-            if (error.name === 'QuoteApiError' && error.details) {
-                errorMessage = 'Validation failed: Please check your information and try again';
+            if (error.name === 'ValidationError') {
+                errorMessage = error.message || 'Validation failed: Please check your information and try again';
+                errorDetails = error.validationErrors;
+            } else if (error.name === 'DuplicateError') {
+                errorMessage = error.message || 'This quote has already been submitted';
                 errorDetails = error.details;
+            } else if (error.name === 'APIError') {
+                errorMessage = error.message || 'Unable to process your quote request';
+                errorDetails = error.details;
+            } else if (error.name === 'NetworkError') {
+                errorMessage = error.message || 'Network connection issue';
             } else if (error.response?.data?.detail) {
+                // Legacy error format
                 errorMessage = 'Server validation error: Please verify your information';
                 errorDetails = error.response.data.detail;
             } else if (error.message) {
@@ -100,7 +112,8 @@ function QuoteForm() {
                 details: errorDetails,
                 timestamp: new Date().toISOString(),
                 apiPayload: apiPayload,
-                originalError: error.message
+                originalError: error.message,
+                errorType: error.name || 'UnknownError'
             }));
             sessionStorage.setItem('quoteStatus', 'error');
             

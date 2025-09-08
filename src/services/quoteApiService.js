@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { processAPIError } from '@utils/errorHandler';
 
 // Get the API URL for quotes
 const QUOTE_API_URL = import.meta.env.VITE_QUOTE_API_URL || "https://api.surestrat.xyz/api/v1/quote";
@@ -30,22 +31,6 @@ quoteAxiosInstance.interceptors.response.use(undefined, async (err) => {
     return quoteAxiosInstance(config);
 });
 
-export class QuoteApiError extends Error {
-    constructor(message, status, details = null) {
-        super(message);
-        this.name = 'QuoteApiError';
-        this.status = status;
-        this.details = details;
-    }
-}
-
-export class QuoteNetworkError extends Error {
-    constructor(message) {
-        super(message || 'Unable to connect to the quote server. Please check your internet connection.');
-        this.name = 'QuoteNetworkError';
-    }
-}
-
 export const submitQuote = async (payload) => {
     try {
         console.log("[quoteApiService] Submitting quote with payload:", payload);
@@ -62,63 +47,40 @@ export const submitQuote = async (payload) => {
         });
         
         console.log("[quoteApiService] Quote response:", response);
-        return response.data;
+        
+        // Handle the new structured API response format
+        const responseData = response.data;
+        
+        // Check if response has the new structured format
+        if (responseData && typeof responseData.success === 'boolean') {
+            if (responseData.success) {
+                // Successful response - return the data
+                console.log("[quoteApiService] Successful quote data:", responseData.data);
+                return responseData.data;
+            } else {
+                // Error response - process and throw structured error
+                const error = processAPIError({ response: { data: responseData } }, 'quoteApiService');
+                console.error("[quoteApiService] API returned error:", error);
+                throw error;
+            }
+        } else {
+            // Legacy response format - assume success and return as-is
+            console.log("[quoteApiService] Legacy response format detected:", responseData);
+            return responseData;
+        }
+        
     } catch (error) {
         console.error("[quoteApiService] Quote submission error:", error);
         
-        // Network errors
-        if (!error.response) {
-            throw new QuoteNetworkError(
-                'Unable to connect to the quote server. Please check your internet connection and try again.'
-            );
+        // If it's already a processed error, just throw it
+        if (error.name === 'APIError' || error.name === 'ValidationError' || 
+            error.name === 'DuplicateError' || error.name === 'NetworkError') {
+            throw error;
         }
-
-                // Log the error response for debugging
-        console.error("[quoteApiService] Error response data:", error.response.data);
-        console.error("[quoteApiService] Error response status:", error.response.status);
         
-        // API errors
-        switch (error.response.status) {
-            case 400:
-                throw new QuoteApiError(
-                    'The submitted quote information was invalid. Please check your inputs and try again.',
-                    400,
-                    error.response.data
-                );
-            case 401:
-                throw new QuoteApiError(
-                    'Your session has expired. Please refresh the page and try again.',
-                    401
-                );
-            case 403:
-                throw new QuoteApiError(
-                    'You do not have permission to perform this action.',
-                    403
-                );
-            case 422: {
-                const validationMessage = error.response.data?.detail || error.response.data?.message || 'Validation failed';
-                throw new QuoteApiError(
-                    `Validation failed: ${validationMessage}`,
-                    422,
-                    error.response.data
-                );
-            }
-            case 429:
-                throw new QuoteApiError(
-                    'Too many quote requests. Please wait a moment and try again.',
-                    429
-                );
-            case 500:
-                throw new QuoteApiError(
-                    'An unexpected server error occurred while processing your quote.',
-                    500
-                );
-            default:
-                throw new QuoteApiError(
-                    'An unexpected error occurred. Please try again.',
-                    error.response.status
-                );
-        }
+        // Process unhandled errors
+        const processedError = processAPIError(error, 'quoteApiService');
+        throw processedError;
     }
 };
 
@@ -130,11 +92,33 @@ export const pollQuoteResult = async (quoteId, maxAttempts = 30, intervalMs = 50
         try {
             const response = await quoteAxiosInstance.get(`${QUOTE_API_URL}/${quoteId}/status`);
             
-            if (response.data.status === 'completed') {
-                console.log("[quoteApiService] Quote completed:", response.data);
-                return response.data;
-            } else if (response.data.status === 'failed') {
-                throw new QuoteApiError('Quote processing failed', 500, response.data);
+            // Handle new structured response format
+            const responseData = response.data;
+            
+            if (responseData && typeof responseData.success === 'boolean') {
+                if (responseData.success) {
+                    const data = responseData.data;
+                    if (data.status === 'completed') {
+                        console.log("[quoteApiService] Quote completed:", data);
+                        return data;
+                    } else if (data.status === 'failed') {
+                        const error = processAPIError({ response: { data: responseData } }, 'quoteApiService');
+                        throw error;
+                    }
+                } else {
+                    // Error response
+                    const error = processAPIError({ response: { data: responseData } }, 'quoteApiService');
+                    throw error;
+                }
+            } else {
+                // Legacy format
+                if (responseData.status === 'completed') {
+                    console.log("[quoteApiService] Quote completed:", responseData);
+                    return responseData;
+                } else if (responseData.status === 'failed') {
+                    const error = processAPIError({ response: { data: { success: false, error: { code: 'QUOTE_API_ERROR', message: 'Quote processing failed' } } } }, 'quoteApiService');
+                    throw error;
+                }
             }
             
             // Still processing, wait and try again
@@ -151,5 +135,76 @@ export const pollQuoteResult = async (quoteId, maxAttempts = 30, intervalMs = 50
         }
     }
     
-    throw new QuoteApiError('Quote processing timed out. Please try again later.', 408);
+    const timeoutError = processAPIError({ 
+        response: { 
+            data: { 
+                success: false, 
+                error: { 
+                    code: 'QUOTE_API_ERROR', 
+                    message: 'Quote processing timed out. Please try again later.' 
+                } 
+            } 
+        } 
+    }, 'quoteApiService');
+    throw timeoutError;
+};
+
+// Get quote by ID
+export const getQuoteById = async (quoteId) => {
+    try {
+        console.log("[quoteApiService] Fetching quote with ID:", quoteId);
+        
+        const response = await quoteAxiosInstance.get(`${QUOTE_API_URL}/${quoteId}`, {
+            headers: {
+                "Accept": "application/json",
+                "X-Request-ID": Date.now(),
+                "X-Source": "SureStrat-Portal"
+            }
+        });
+        
+        console.log("[quoteApiService] Quote retrieval response:", response);
+        
+        // Your backend returns direct quote data, not wrapped in success/data structure
+        const quoteData = response.data;
+        
+        // Transform to expected format for frontend
+        const transformedQuote = {
+            quoteId: quoteData.quoteId || quoteData.id,
+            premium: parseFloat(quoteData.premium),
+            excess: parseFloat(quoteData.excess),
+            externalReferenceId: quoteData.internalReference,
+            status: quoteData.status?.toLowerCase() === 'pending' ? 'active' : quoteData.status?.toLowerCase(),
+            createdAt: quoteData.created_at,
+            agentEmail: quoteData.agentEmail,
+            agentBranch: quoteData.agentBranch
+        };
+        
+        console.log("[quoteApiService] Transformed quote data:", transformedQuote);
+        return transformedQuote;
+        
+    } catch (error) {
+        console.error("[quoteApiService] Quote retrieval error:", error);
+        
+        // Handle 404 specifically
+        if (error.response?.status === 404) {
+            const notFoundError = new Error('Quote not found or may have expired.');
+            notFoundError.name = 'QuoteNotFoundError';
+            notFoundError.code = 'QUOTE_NOT_FOUND';
+            throw notFoundError;
+        }
+        
+        // Handle other HTTP errors
+        if (error.response?.status) {
+            const apiError = new Error(`Failed to retrieve quote: ${error.response.status}`);
+            apiError.name = 'QuoteApiError';
+            apiError.code = 'QUOTE_RETRIEVAL_ERROR';
+            throw apiError;
+        }
+        
+        // Handle network errors
+        const networkError = new Error('Network error while retrieving quote information.');
+        networkError.name = 'NetworkError';
+        networkError.code = 'NETWORK_ERROR';
+        throw networkError;
+    }
 };
