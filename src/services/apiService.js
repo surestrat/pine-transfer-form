@@ -1,12 +1,11 @@
 import axios from 'axios';
-
 import { processAPIError } from '@utils/errorHandler';
 
 // Get the API URL from environment variables
 const API_URL = 
     import.meta.env.VITE_PINE_API_URL || 
     (import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/v1/transfer` : null) || 
-    "https://api.surestrat.xyz/api/v1/transfer";
+    "https://api.usa-solarenergy.com/api/v1/transfer";
 
 console.log("[apiService] Environment check:");
 console.log("- VITE_API_URL:", import.meta.env.VITE_API_URL);

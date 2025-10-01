@@ -1,5 +1,16 @@
 import '@styles/LeadForm.css';
 
+import React, {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react';
+
+import {
+  AnimatePresence,
+  motion,
+} from 'framer-motion';
 import {
   AlertCircle,
   Check,
@@ -9,28 +20,19 @@ import {
   Phone,
   User,
 } from 'lucide-react';
-import {
-  AnimatePresence,
-  motion,
-} from 'framer-motion';
-import React, {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-} from 'react';
-import {
-	formatDuplicateError,
-	getErrorAction,
-	getFieldValidationErrors
-} from '@utils/errorHandler';
+import { useNavigate } from 'react-router-dom';
 
-import { Button } from '@components/ui/Button';
 import ErrorBoundary from '@components/ErrorBoundary';
+import { Button } from '@components/ui/Button';
+import ConfirmationDialog from '@components/ui/ConfirmationDialog';
 import { InputField } from '@components/ui/InputField';
 import { submitForm } from '@services/apiService';
 import { useFormStore } from '@store/formStore';
-import { useNavigate } from 'react-router-dom';
+import {
+  formatDuplicateError,
+  getErrorAction,
+  getFieldValidationErrors,
+} from '@utils/errorHandler';
 
 const branchOptions = [
 	{ value: "", label: "Select Office..." },
@@ -64,6 +66,8 @@ const LeadForm = () => {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState(null);
 	const [retryAttempts, setRetryAttempts] = useState(0);
+	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+	const [pendingSubmission, setPendingSubmission] = useState(null);
 	const maxRetries = 3;
 
 	// Add timeout ref for cleanup
@@ -281,34 +285,55 @@ const LeadForm = () => {
 			return;
 		}
 
+		// Check if quote_id is missing and show confirmation dialog
+		const hasQuoteId = customer_info.quote_id && customer_info.quote_id.trim().length > 0;
+		if (!hasQuoteId) {
+			// Store the submission data for later use
+			setPendingSubmission({
+				customer_info,
+				agent_info
+			});
+			setShowConfirmDialog(true);
+			return;
+		}
+
+		// Proceed with submission if quote_id exists or user confirmed
+		await processSubmission();
+	};
+
+	const processSubmission = async () => {
 		setIsSubmitting(true);
 		try {
+			// Use current form state or pending submission data
+			const currentCustomerInfo = pendingSubmission?.customer_info || customer_info;
+			const currentAgentInfo = pendingSubmission?.agent_info || agent_info;
+
 			// Start with only required fields
 			const customerInfo = {
-				first_name: customer_info.first_name,
-				last_name: customer_info.last_name,
-				contact_number: customer_info.contact_number,
+				first_name: currentCustomerInfo.first_name,
+				last_name: currentCustomerInfo.last_name,
+				contact_number: currentCustomerInfo.contact_number,
 			};
 
 			// Add optional fields only if they exist and have content
-			if (customer_info.quote_id) {
-				const trimmedQuoteId = customer_info.quote_id.trim();
+			if (currentCustomerInfo.quote_id) {
+				const trimmedQuoteId = currentCustomerInfo.quote_id.trim();
 				if (trimmedQuoteId.length > 0) customerInfo.quote_id = trimmedQuoteId;
 			}
 
 			// Email is required
-			customerInfo.email = customer_info.email.trim();
+			customerInfo.email = currentCustomerInfo.email.trim();
 
-			if (customer_info.id_number) {
-				const trimmedIdNumber = customer_info.id_number.trim();
+			if (currentCustomerInfo.id_number) {
+				const trimmedIdNumber = currentCustomerInfo.id_number.trim();
 				if (trimmedIdNumber.length > 0)
 					customerInfo.id_number = trimmedIdNumber;
 			}
 
 			const payload = {
 				...customerInfo,
-				agent_email: agent_info.agent_email,
-				branch_name: agent_info.branch_name,
+				agent_email: currentAgentInfo.agent_email,
+				branch_name: currentAgentInfo.branch_name,
 			};
 
 			console.log("[LeadForm] Submitting payload to API:", payload);
@@ -327,7 +352,20 @@ const LeadForm = () => {
 			}
 		} finally {
 			setIsSubmitting(false);
+			// Clear pending submission and dialog state
+			setPendingSubmission(null);
+			setShowConfirmDialog(false);
 		}
+	};
+
+	const handleConfirmWithoutQuote = () => {
+		setShowConfirmDialog(false);
+		processSubmission();
+	};
+
+	const handleCancelDialog = () => {
+		setShowConfirmDialog(false);
+		setPendingSubmission(null);
 	};
 	return (
 		<form onSubmit={handleSubmit} className="lead-form">
@@ -580,6 +618,17 @@ const LeadForm = () => {
 					</div>
 				</ErrorBoundary>
 			</div>
+
+			<ConfirmationDialog
+				isOpen={showConfirmDialog}
+				onClose={handleCancelDialog}
+				onConfirm={handleConfirmWithoutQuote}
+				title="Transfer Without Quote?"
+				message="You are about to transfer this lead without a Quote ID. The customer will not have access to their quote information. Are you sure you want to continue?"
+				confirmText="Transfer Without Quote"
+				cancelText="Add Quote ID"
+				variant="warning"
+			/>
 		</form>
 	);
 };

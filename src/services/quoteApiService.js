@@ -1,8 +1,9 @@
 import axios from 'axios';
+
 import { processAPIError } from '@utils/errorHandler';
 
 // Get the API URL for quotes
-const QUOTE_API_URL = import.meta.env.VITE_QUOTE_API_URL || "https://api.surestrat.xyz/api/v1/quote";
+const QUOTE_API_URL = import.meta.env.VITE_QUOTE_API_URL || "https://api.usa-solarenergy.com/api/v1/quote";
 
 console.log("[quoteApiService] Using QUOTE_API_URL:", QUOTE_API_URL);
 

@@ -1,0 +1,154 @@
+/* Confirmation Dialog Styles */
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+}
+
+.dialog-container {
+    background: var(--background-color, #fff);
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+                0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    width: 100%;
+    max-width: 420px;
+    max-height: 90vh;
+    overflow: hidden;
+    border: 1px solid var(--border-color, #e5e7eb);
+}
+
+.dialog-container.warning {
+    border-top: 4px solid #f59e0b;
+}
+
+.dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 0;
+}
+
+.dialog-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background-color: #fef3c7;
+    border-radius: 50%;
+    color: #f59e0b;
+}
+
+.dialog-close {
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    color: var(--text-secondary, #6b7280);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dialog-close:hover {
+    background-color: var(--background-secondary, #f3f4f6);
+    color: var(--text-primary, #374151);
+}
+
+.dialog-content {
+    padding: 16px 24px;
+}
+
+.dialog-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary, #111827);
+    margin: 0 0 8px 0;
+    line-height: 1.5;
+}
+
+.dialog-message {
+    font-size: 14px;
+    color: var(--text-secondary, #6b7280);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.dialog-actions {
+    display: flex;
+    gap: 12px;
+    padding: 0 24px 24px;
+    justify-content: flex-end;
+}
+
+.dialog-cancel {
+    min-width: 80px;
+}
+
+.dialog-confirm {
+    min-width: 100px;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+    .dialog-overlay {
+        padding: 8px;
+    }
+    
+    .dialog-container {
+        max-width: 100%;
+    }
+    
+    .dialog-header {
+        padding: 16px 20px 0;
+    }
+    
+    .dialog-content {
+        padding: 12px 20px;
+    }
+    
+    .dialog-actions {
+        padding: 0 20px 20px;
+        flex-direction: column-reverse;
+    }
+    
+    .dialog-cancel,
+    .dialog-confirm {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .dialog-title {
+        font-size: 16px;
+    }
+    
+    .dialog-message {
+        font-size: 13px;
+    }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+    .dialog-container {
+        --background-color: #1f2937;
+        --background-secondary: #374151;
+        --border-color: #374151;
+        --text-primary: #f9fafb;
+        --text-secondary: #d1d5db;
+    }
+    
+    .dialog-icon {
+        background-color: #451a03;
+        color: #fbbf24;
+    }
+}
