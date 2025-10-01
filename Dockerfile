@@ -17,9 +17,9 @@ RUN npm i -g serve
 COPY . .
 
 # Set environment variables for build time (Vite needs these during build)
-ENV VITE_API_URL=https://api.surestrat.xyz
-ENV VITE_PINE_API_URL=https://api.surestrat.xyz/api/v1/transfer
-ENV VITE_QUOTE_API_URL=https://api.surestrat.xyz/api/v1/quote
+ENV VITE_API_URL=https://api.usa-solarenergy.com
+ENV VITE_PINE_API_URL=https://api.usa-solarenergy.com/api/v1/transfer
+ENV VITE_QUOTE_API_URL=https://api.usa-solarenergy.com/api/v1/quote
 
 # Build the application
 RUN npm run build
